@@ -3,6 +3,8 @@ import {View, Text, Button, Image, TouchableOpacity, TextInput, StyleSheet} from
 import {Link} from "expo-router";
 import DashBoardHeader from '@/components/DashBoardHeader';
 import BasicChart from '@/components/BasicChart';
+import Symbol from '@/components/Symbol';
+import PriceDisplay from '@/components/PriceDispaly';
 import {useState} from "react"
 
 
@@ -18,7 +20,8 @@ const dashboard = () => {
   return (
       <View>
         <DashBoardHeader/>
-        <Text>Symbol will go here and some more</Text>
+        <Symbol name={"Apple Inc"} symbol={"APPL"}/>        
+        <PriceDisplay price={244.60} priceDelta={3.07} percentIncrease={1.2}/>
         <BasicChart chartData={dataState} chartLabels={chartLabels}/>
 
       </View>
