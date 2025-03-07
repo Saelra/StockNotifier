@@ -5,6 +5,7 @@ import DashBoardHeader from '@/components/DashBoardHeader';
 import BasicChart from '@/components/BasicChart';
 import Symbol from '@/components/Symbol';
 import PriceDisplay from '@/components/PriceDispaly';
+import History from '@/components/HistoryExample'
 import {useState} from "react"
 
 
@@ -23,6 +24,7 @@ const dashboard = () => {
         <Symbol name={"Apple Inc"} symbol={"APPL"}/>        
         <PriceDisplay price={244.60} priceDelta={3.07} percentIncrease={1.2}/>
         <BasicChart chartData={dataState} chartLabels={chartLabels}/>
+        <History />
 
       </View>
     );
