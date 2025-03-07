@@ -1,42 +1,58 @@
 import React from "react";
-import {View, Text, StyleSheet} from 'react-native'
+import { View, Text, StyleSheet } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-type priceProps = {
-    price: number,
-    priceDelta: number,
-    percentIncrease: number
-}
-const priceDisplay = ({price, priceDelta, percentIncrease} : priceProps) =>{
-   let date = new Date()
-   const monthName = ["January", "February", "March", "April", "May", "June",
+type PriceProps = {
+  price: number;
+  priceDelta: number;
+  percentIncrease: number;
+};
+
+const PriceDisplay = ({ price, priceDelta, percentIncrease }: PriceProps) => {
+  const date = new Date();
+  const monthName = [
+    "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-   
-    return (
-   <View>
-        <Text style={styles.styleDate}>{monthName[date.getMonth()]} {date.getDay()} {date.getFullYear()}</Text>
-        <Text style={styles.currentPrice}> {price} </Text>
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.styleDate}>
+        {monthName[date.getMonth()]} {date.getDate()}, {date.getFullYear()}
+      </Text>
+
+      <View style={styles.priceContainer}>
+        <Text style={styles.currentPrice}>${price.toFixed(2)}</Text>
+        <Ionicons
+            name={priceDelta >= 0 ? "arrow-up-outline" : "arrow-down-outline"}
+            size={15}
+            color={priceDelta >= 0 ? "green" : "red"}
+        />
+        <Text style={{ color: priceDelta >= 0 ? "green" : "red" }}>
+            {priceDelta >= 0 ? "+" : ""}${priceDelta.toFixed(2)} ({percentIncrease.toFixed(2)}%)
+        </Text>
+      </View>
+
     </View>
-   )
+  );
+};
 
-
-}
-
-export default priceDisplay;
+export default PriceDisplay;
 
 const styles = StyleSheet.create({
-    styleDate : {
-        fontSize:15,
-        paddingLeft: 10,
-        marginTop:20
-    },
-
-    currentPrice : {
-        fontSize: 30,
-        paddingLeft: 5
-    },
-
-    arrowPointer: {
-        
-    }
-})
+  container: {
+    padding: 10,
+  },
+  styleDate: {
+    fontSize: 15,
+    marginTop: 20,
+  },
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  currentPrice: {
+    fontSize: 30,
+    paddingRight: 5,
+  },
+});
