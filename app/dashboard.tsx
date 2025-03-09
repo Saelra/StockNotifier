@@ -33,6 +33,7 @@ const saveData = async (key : string, data: stockInformation ) => {
   try {
     const jsonData = JSON.stringify(data);
     await AsyncStorage.setItem(key, jsonData);
+    console.log("data updated");
   } catch (error) {
     console.error("Error saving data:", error);
   }
@@ -96,7 +97,12 @@ const dashboard = () => {
 
 
   function addPrice(newStockPrice : number) : void {
-    setDataState([...dataState, newStockPrice]);
+    const newArray = [...dataState, newStockPrice];
+    if(dataState.length > 30){
+      newArray.shift();
+    }
+
+    setDataState(newArray);
 
     const newPriceInfo : priceInformation = {
       price: newStockPrice,
@@ -108,7 +114,19 @@ const dashboard = () => {
     updateCurrentStockInfo();
   }
 
-  
+  function addMOckData(){
+    const num = (Math.random() * (600 - 400 + 1)) + 400;
+    addPrice(num);
+  }
+
+  function clearData(){
+    const priceI : priceInformation = {
+      price: 0,
+      priceDelta: 0,
+      percentIncrease: 0
+    };
+    updateCurrentStockInfo
+  }
   
 
   return (
@@ -118,7 +136,8 @@ const dashboard = () => {
         <PriceDisplay price={priceInfo.price} priceDelta={priceInfo.priceDelta} percentIncrease={priceInfo.percentIncrease}/>
         <BasicChart chartData={dataState}/>
         <History />
-
+        <Button title="Add MOck Data" onPress={addMOckData} />
+        <Button title="clear data" onPress={clearData} />
       </View>
     );
   };

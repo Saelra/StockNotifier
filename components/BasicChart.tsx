@@ -22,7 +22,7 @@ function calculateChartLabels (data: number[]): string[] {
    if(data.length === 0 || data.length === null){
     return [];
    } else {
-    for(let i = data.length; i > 0; i--){
+    for(let i = data.length; i < 0; i--){
         chartLabels[i-1] = i.toString();
     }
    }
@@ -59,7 +59,7 @@ const ChartObject = ({ chartData}: chartProp, ) => {
             borderRadius: 16
         },
         propsForDots: {
-            r: "6",
+            r: "1",
             strokeWidth: "2",
             stroke: "#ffa726"
         }
