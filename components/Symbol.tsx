@@ -3,8 +3,8 @@ import {View, Text, StyleSheet } from "react-native";
 
 
 type symbolProps = {
-    symbol: string,
-    name: string
+    symbol?: string,
+    name?: string
 };
 
 const symbolHeader = ({symbol, name} : symbolProps) => {

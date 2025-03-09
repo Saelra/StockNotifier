@@ -6,24 +6,117 @@ import BasicChart from '@/components/BasicChart';
 import Symbol from '@/components/Symbol';
 import PriceDisplay from '@/components/PriceDispaly';
 import History from '@/components/HistoryExample'
-import {useState} from "react"
+import {useState, useEffect} from "react"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
-const chartData = [100, 200, 300, 400, 500];
-const  chartLabels = ["1 hour", "2 hour", "3 hour", "4 hour", "5 hour"];
 
+
+
+
+
+
+type priceInformation = {
+  price: number;
+  priceDelta : number;
+  percentIncrease: number;
+}
+
+type symbolInformation = {
+  name: string;
+  symbol: string;
+}
+
+
+const saveData = async (key : string, data: stockInformation ) => {
+  try {
+    const jsonData = JSON.stringify(data);
+    await AsyncStorage.setItem(key, jsonData);
+  } catch (error) {
+    console.error("Error saving data:", error);
+  }
+}
+
+const getData = async (key: string): Promise<stockInformation | null> => {
+  try {
+    const jsonData = await AsyncStorage.getItem(key);
+    return jsonData != null ? JSON.parse(jsonData) : null;
+  } catch (error) {
+    console.error("Error retrieving data:", error);
+    return null;
+  }
+};
+
+interface stockInformation{
+  priceI : priceInformation;
+  symbolI: symbolInformation;
+  graphP: number[];
+}
 
 
 
 const dashboard = () => {
-  const[dataState, setDataState] = useState([100, 200, 300, 400, 500]);
+
+  const [dataState, setDataState] = useState([0, 200, 300, 400, 500]);
+  const [priceInfo, setPriceInfo] = useState<priceInformation>({price: 0, priceDelta: 0, percentIncrease: 0})
+  const [symbolInfo, setSymbolInfo] = useState<symbolInformation>({name : "-----", symbol: "---" })
+  
+  const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
+    const currentStock : stockInformation = {
+      priceI : priceInfo,
+      symbolI: symbolInfo,
+      graphP: dataState
+     }
+     return currentStock;
+  })
+
+  useEffect(() => {
+    getData('userStockInfo').then(value => {
+      if(value) {
+        console.log("Success! values retreived from storage");
+        setDataState(value.graphP);
+        setPriceInfo(value.priceI);
+        setSymbolInfo(value.symbolI);
+      }
+       
+      updateCurrentStockInfo();
+    }
+  )}, []);
+ 
+  function updateCurrentStockInfo(): void{
+    const currentStock : stockInformation = {
+      priceI : priceInfo,
+      symbolI: symbolInfo,
+      graphP: dataState
+     }
+     setCurrentStockInfo(currentStock);
+     saveData('userStockInfo', currentStockInfo);
+  }
+
+
+  function addPrice(newStockPrice : number) : void {
+    setDataState([...dataState, newStockPrice]);
+
+    const newPriceInfo : priceInformation = {
+      price: newStockPrice,
+      priceDelta : (priceInfo.price - newStockPrice),
+      percentIncrease : (Math.abs(priceInfo.price - newStockPrice) / newStockPrice) * 100
+    }
+    setPriceInfo(newPriceInfo);
+
+    updateCurrentStockInfo();
+  }
+
+  
+  
+
   return (
       <View>
         <DashBoardHeader/>
-        <Symbol name={"Apple Inc"} symbol={"APPL"}/>        
-        <PriceDisplay price={244.60} priceDelta={3.07} percentIncrease={1.2}/>
-        <BasicChart chartData={dataState} chartLabels={chartLabels}/>
+        <Symbol name={symbolInfo.name} symbol={symbolInfo.symbol}/>        
+        <PriceDisplay price={priceInfo.price} priceDelta={priceInfo.priceDelta} percentIncrease={priceInfo.percentIncrease}/>
+        <BasicChart chartData={dataState}/>
         <History />
 
       </View>

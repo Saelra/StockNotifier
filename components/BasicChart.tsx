@@ -14,17 +14,29 @@ const screenWidth = Dimensions.get("window").width;
 
 type chartProp = {
   chartData : number[],
-  chartLabels: string[]  
+  
 }
 
-const ChartObject = ({ chartData, chartLabels}: chartProp, dataS: dataState ) => {
+function calculateChartLabels (data: number[]): string[] {
+   let chartLabels : string[] = [];
+   if(data.length === 0 || data.length === null){
+    return [];
+   } else {
+    for(let i = data.length; i > 0; i--){
+        chartLabels[i-1] = i.toString();
+    }
+   }
+   return chartLabels;
+  }
+
+const ChartObject = ({ chartData}: chartProp, ) => {
     return (
     <View>
     
     
     <LineChart
         data={{
-        labels: chartLabels,
+        labels: calculateChartLabels(chartData),
         datasets: [
             {
             data: chartData
