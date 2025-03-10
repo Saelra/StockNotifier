@@ -6,21 +6,22 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 type historyProp =  {
     hDate : Date,
     description : string,
-    positive : boolean
+    isPositive : boolean,
+    priceDifference : number
 
 }
 
 
 
-const HistoryItem = ({hDate, description, positive} : historyProp) => {
+const HistoryItem = ({hDate, description, isPositive, priceDifference} : historyProp) => {
     return (
         <>
         <View style={styles.container}>
             <Ionicons name="alert-circle" size={35} />
-            <Text > {hDate.getDate()}/{hDate.getMonth()}/{hDate.getFullYear()}</Text>
+            <Text > {hDate.toLocaleDateString()}</Text>
             <Ionicons name="trash" size={35} style={styles.trashStyle}/>
         </View>
-            <Text style ={{color : positive ? "green" : "red", marginLeft: 45}}> {description} </Text>
+            <Text style ={{color : isPositive? "green" : "red", marginLeft: 45}}> stock price {description} threshold by {priceDifference} </Text>
         </>
     )
 }
@@ -35,12 +36,13 @@ const styles = StyleSheet.create({
   },
 
   descriptionStyle  : {
+    flex:1,
     marginLeft: 45
 
   },
 
   trashStyle : {
-    marginLeft: 250
+    marginLeft: "auto" 
   }
 
 });

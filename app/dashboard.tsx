@@ -11,11 +11,32 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
-
-
-
-
-
+type historyObject = {
+  dateOccurance : Date,
+  description: string,
+  isPositive: boolean,
+  priceDifference : number 
+}
+const createFakeHistory : historyObject[] = [
+      {
+        dateOccurance : new Date('2025-01-01'),
+        description: "stock price above threshold by $5.36",
+        isPositive: true,
+        priceDifference : 4.00 
+    },
+    {
+      dateOccurance : new Date('2025-01-28'),
+      description: "stock price below threshold by -$5.36",
+      isPositive: false,
+      priceDifference : 2.00 
+    }, 
+    {
+      dateOccurance : new Date('2025-02-14'),
+      description: "stock price above threshold by $5.36",
+      isPositive: true,
+      priceDifference : 4.80 
+    }
+  ]
 
 type priceInformation = {
   price: number;
@@ -135,7 +156,7 @@ const dashboard = () => {
         <Symbol name={symbolInfo.name} symbol={symbolInfo.symbol}/>        
         <PriceDisplay price={priceInfo.price} priceDelta={priceInfo.priceDelta} percentIncrease={priceInfo.percentIncrease}/>
         <BasicChart chartData={dataState}/>
-        <History />
+        <History historyList = {createFakeHistory}/>
         <Button title="Add MOck Data" onPress={addMOckData} />
         <Button title="clear data" onPress={clearData} />
       </View>
