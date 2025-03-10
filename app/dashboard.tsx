@@ -49,6 +49,11 @@ type symbolInformation = {
   symbol: string;
 }
 
+interface stockInformation{
+  priceI : priceInformation;
+  symbolI: symbolInformation;
+  graphP: number[];
+}
 
 const saveData = async (key : string, data: stockInformation ) => {
   try {
@@ -69,14 +74,6 @@ const getData = async (key: string): Promise<stockInformation | null> => {
     return null;
   }
 };
-
-interface stockInformation{
-  priceI : priceInformation;
-  symbolI: symbolInformation;
-  graphP: number[];
-}
-
-
 
 const dashboard = () => {
 
@@ -112,6 +109,10 @@ const dashboard = () => {
       symbolI: symbolInfo,
       graphP: dataState
      }
+
+     //@TODO **************check thresholds for min / max; **********************************
+
+
      setCurrentStockInfo(currentStock);
      saveData('userStockInfo', currentStockInfo);
   }
@@ -119,7 +120,7 @@ const dashboard = () => {
 
   function addPrice(newStockPrice : number) : void {
     const newArray = [...dataState, newStockPrice];
-    if(dataState.length > 30){
+    if(dataState.length > 100){
       newArray.shift();
     }
 
@@ -130,6 +131,7 @@ const dashboard = () => {
       priceDelta : (priceInfo.price - newStockPrice),
       percentIncrease : (Math.abs(priceInfo.price - newStockPrice) / newStockPrice) * 100
     }
+
     setPriceInfo(newPriceInfo);
 
     updateCurrentStockInfo();
@@ -159,6 +161,7 @@ const dashboard = () => {
         <History historyList = {createFakeHistory}/>
         <Button title="Add MOck Data" onPress={addMOckData} />
         <Button title="clear data" onPress={clearData} />
+        <Link href={"/about"}>to About</Link>
       </View>
     );
   };
