@@ -1,15 +1,16 @@
-import { Text, View } from "react-native";
+import {   View, Text, Pressable } from "react-native";
+import React from "react";
+import { Link } from 'expo-router';
 
-export default function Index() {
+const Landing = () => {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
+   <>
+   <Text>Hello World!</Text>
+   <Link href={"/dashboard"}>to the Dashboard</Link>
+   </>
+     
+    
   );
 }
+
+export default Landing;
