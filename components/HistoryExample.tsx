@@ -5,7 +5,6 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 type historyObject = {
     dateOccurance : Date,
-    description: string,
     isPositive: boolean,
     priceDifference : number 
 }
@@ -24,7 +23,7 @@ const History : React.FC<HistoryProps> = ({historyList}) => {
             </SafeAreaView>
             <FlatList 
                 data={historyList}
-                renderItem={({item}) => <HistoryItem hDate={item.dateOccurance} description={item.description} isPositive={item.isPositive} priceDifference={item.priceDifference} />}
+                renderItem={({item}) => <HistoryItem hDate={item.dateOccurance}  isPositive={item.isPositive} priceDifference={item.priceDifference} />}
             />
         </>
        
