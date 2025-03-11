@@ -38,6 +38,29 @@ export const fetchStockResult = async (stockSymbol: string) => {
     });
 }
 
+// Structure of the stock aggregate data.
+interface StockAggregate {
+
+    adjusted: boolean, // Whether or not this response was adjusted for splits.
+    next_url?: string, // If present, this value can be used to fetch the next page of data.
+    queryCount: number, // The number of aggregates (minute or day) used to generate the response.
+    request_id: string, // A request id assigned by the server.
+    results: Array<{
+        c: number, // The close price for the symbol in the given time period.
+        h: number, // The highest price for the symbol in the given time period.
+        l: number, // The lowest price for the symbol in the given time period.
+        n: number, // The number of transactions in the aggregate window.
+        o: number, // The open price for the symbol in the given time period.
+        otc?: number, // Whether or not this aggregate is for an OTC ticker. This field will be left off if false.
+        t: number, // The Unix Msec timestamp for the start of the aggregate window.
+        v: number, // The trading volume of the symbol in the given time period.
+        vw: number // The volume weighted average price.
+      }>,
+    resultsCount: number, // The total number of results for this request.
+    status: string, // The status of this request's response.
+    ticker: string // The exchange symbol that this item is traded under.
+}
+
 /**
  * Fetches an aggregation of stock data over a set time span.
  *
@@ -52,7 +75,17 @@ export const fetchStockResult = async (stockSymbol: string) => {
  * @param incrementAmount - The number of increments to use
  * @param incrementMultiplier - The amount of time per increment
  */
-export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier = 1) => {
+export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier = 1): Promise<StockAggregate> => {
+
+    let stockAggregate: StockAggregate = {
+        adjusted: false,
+        queryCount: 0,
+        request_id: '',
+        results: [],
+        resultsCount: 0,
+        status: '',
+        ticker: ''
+    };
 
     // Check if the time span is valid (contained in the array of known values).
     if (timeSpans.indexOf(timeSpan.toLowerCase().trim()) == -1) {
@@ -84,8 +117,10 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
         // fetch the aggregate stock data.
         rest.stocks.aggregates(stockSymbol, incrementMultiplier, timeSpan, formatDateISO(startingDate), formatDateISO(new Date()), {sort: 'asc'}).then((data) => {
             console.log(data);
+            stockAggregate = data as unknown as StockAggregate;
         }).catch(e => {
             console.error(e);
         });
     }
+    return stockAggregate;
 }
