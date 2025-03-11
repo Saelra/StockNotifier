@@ -22,10 +22,10 @@ const dbHeader = ({min, max, setMin, setMax}: dbHeaderProps ) => {
           />
         </View>
         
-          {/* <Link href={{ pathname:'/settings', query: {min: min, max: max, setMin, setMax}}}>
-          
-          </Link> */}
+          <Link href={{ pathname:'/settings', query: {min: min, max: max, setMin, setMax}}}>
           <Icon name="gear" size={25} color="#000" />
+          </Link>
+          
      
       </View>
     );
