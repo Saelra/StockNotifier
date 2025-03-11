@@ -51,6 +51,8 @@ interface stockInformation{
   priceI : priceInformation;
   symbolI: symbolInformation;
   graphP: number[];
+  min: number;
+  max: number;
 }
 
 const saveData = async (key : string, data: stockInformation ) => {
@@ -78,14 +80,16 @@ const dashboard = () => {
   const [dataState, setDataState] = useState([0, 200, 300, 400, 500]);
   const [priceInfo, setPriceInfo] = useState<priceInformation>({price: 0, priceDelta: 0, percentIncrease: 0})
   const [symbolInfo, setSymbolInfo] = useState<symbolInformation>({name : "-----", symbol: "---" })
-  const [minValue, setMinValue] = useState("100");
-  const [maxValue, setMaxValue] = useState("500");
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(0);
   
   const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
     const currentStock : stockInformation = {
       priceI : priceInfo,
       symbolI: symbolInfo,
-      graphP: dataState
+      graphP: dataState,
+      min: minValue,
+      max: maxValue
      }
      return currentStock;
   })
@@ -97,6 +101,8 @@ const dashboard = () => {
         setDataState(value.graphP);
         setPriceInfo(value.priceI);
         setSymbolInfo(value.symbolI);
+        setMinValue(value.min);
+        setMaxValue(value.max);
       }
        
       updateCurrentStockInfo();

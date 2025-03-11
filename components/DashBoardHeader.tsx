@@ -6,11 +6,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 interface dbHeaderProps{
   min: number;
   max: number;
-  
+  setMin: () => number;
+  setMax: () => number;
 
 }
 
-const dbHeader = ( ) => {
+const dbHeader = ({min, max, setMin, setMax}: dbHeaderProps ) => {
     return (
       <View style={styles.header}>
         <View style={styles.searchContainer}>
@@ -21,10 +22,10 @@ const dbHeader = ( ) => {
           />
         </View>
         
-          <Link href={"/about"}>
+          {/* <Link href={{ pathname:'/settings', query: {min: min, max: max, setMin, setMax}}}>
           
+          </Link> */}
           <Icon name="gear" size={25} color="#000" />
-          </Link>
      
       </View>
     );
