@@ -17,8 +17,8 @@ import {
 import BackgroundFetch from "react-native-background-fetch";
 
 import { fetchStockAggregate } from '../services/stock-api';
-import { setStockData, getStockData } from '../services/stock-storage';
-import { IAggs } from '@polygon.io/client-js';
+import { setData, getData } from '../services/stock-storage';
+import { stockInformation } from '../app/dashboard';
 
 interface Props {
   stockSymbol: string;
@@ -36,7 +36,10 @@ interface State {
     taskId: string;
     timestamp: string;
   }[];
-  stockData: {};
+  stockData: {
+    symbol: string;
+    price: number;
+  };
 }
 
 class App extends React.Component<Props, State> {
@@ -44,7 +47,10 @@ class App extends React.Component<Props, State> {
     super(props);
     this.state = {
       events: [],
-      stockData: {}
+      stockData: {
+        symbol: "",
+        price: -1
+      }
     };
   }
 
@@ -64,9 +70,9 @@ class App extends React.Component<Props, State> {
       let { stockData } = this.state;
 
       // Update the stock data.
-      stockData = fetchStockAggregate(stockSymbol, timeSpan, incrementAmount, incrementMultiplier);
+      stockData.price = fetchStockAggregate(stockSymbol, timeSpan, incrementAmount, incrementMultiplier);
       this.setState({ stockData });
-      setStockData(stockData as JSON);
+      setData('userStockInfo', stockData);
 
       await this.addEvent(taskId);
       // IMPORTANT:  You must signal to the OS that your task is complete.

@@ -1,7 +1,7 @@
 import React from "react";
 import {View, Text, Button, Image, TouchableOpacity, TextInput, StyleSheet} from "react-native";
 import {Link} from "expo-router";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '@react-native-vector-icons/FontAwesome';
 
 interface dbHeaderProps{
   min: number;
@@ -21,16 +21,16 @@ const dbHeader = ({min, max, setMin, setMax}: dbHeaderProps ) => {
             style={styles.searchInput}
           />
         </View>
-        
+
           {/* <Link href={{ pathname:'/settings', query: {min: min, max: max, setMin, setMax}}}>
-          
+
           </Link> */}
           <Icon name="gear" size={25} color="#000" />
-     
+
       </View>
     );
   };
-  
+
   const styles = StyleSheet.create({
     header: {
       flexDirection: 'row',
@@ -56,5 +56,5 @@ const dbHeader = ({min, max, setMin, setMax}: dbHeaderProps ) => {
       marginRight: 5,
     }
   });
-  
+
   export default dbHeader;

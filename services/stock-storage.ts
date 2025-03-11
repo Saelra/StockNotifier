@@ -1,19 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { stockInformation } from '../app/dashboard';
 
-export const setStockData = async (stockData: JSON) => {
-    try {
-        const jsonValue = JSON.stringify(stockData);
-        await AsyncStorage.setItem('@stock_data', jsonValue);
-    } catch (e) {
-        console.error(e);
-    }
-  };
+export const setData = async (key : string, data: stockInformation ) => {
+  try {
+    const jsonData = JSON.stringify(data);
+    await AsyncStorage.setItem(key, jsonData);
+    console.log(`Data has been saved to ${key}.`);
+  } catch (error) {
+    console.error(`Error saving data to ${key}:`, error);
+  }
+}
 
-export const getStockData = async () => {
-    try {
-        const jsonValue = await AsyncStorage.getItem('@stock_data');
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-    } catch (e) {
-        console.error(e);
-    }
-  };
+export const getData = async (key: string): Promise<stockInformation | null> => {
+  try {
+    const jsonData = await AsyncStorage.getItem(key);
+    return jsonData != null ? JSON.parse(jsonData) : null;
+  } catch (error) {
+    console.error(`Error getting data from ${key}:`, error);
+    return null;
+  }
+};
