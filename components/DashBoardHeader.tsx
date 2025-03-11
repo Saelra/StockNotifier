@@ -3,7 +3,14 @@ import {View, Text, Button, Image, TouchableOpacity, TextInput, StyleSheet} from
 import {Link} from "expo-router";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const dbHeader = () => {
+interface dbHeaderProps{
+  min: number;
+  max: number;
+  
+
+}
+
+const dbHeader = ( ) => {
     return (
       <View style={styles.header}>
         <View style={styles.searchContainer}>
@@ -13,11 +20,12 @@ const dbHeader = () => {
             style={styles.searchInput}
           />
         </View>
-        <TouchableOpacity onPress={() => {
-          // Handle settings navigation here
-        }}>
+        
+          <Link href={"/about"}>
+          
           <Icon name="gear" size={25} color="#000" />
-        </TouchableOpacity>
+          </Link>
+     
       </View>
     );
   };

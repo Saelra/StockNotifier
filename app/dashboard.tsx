@@ -13,26 +13,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type historyObject = {
   dateOccurance : Date,
-  description: string,
   isPositive: boolean,
   priceDifference : number 
 }
 const createFakeHistory : historyObject[] = [
       {
         dateOccurance : new Date('2025-01-01'),
-        description: "stock price above threshold by $5.36",
+      
         isPositive: true,
         priceDifference : 4.00 
     },
     {
       dateOccurance : new Date('2025-01-28'),
-      description: "stock price below threshold by -$5.36",
+     
       isPositive: false,
       priceDifference : 2.00 
     }, 
     {
       dateOccurance : new Date('2025-02-14'),
-      description: "stock price above threshold by $5.36",
       isPositive: true,
       priceDifference : 4.80 
     }
@@ -80,6 +78,8 @@ const dashboard = () => {
   const [dataState, setDataState] = useState([0, 200, 300, 400, 500]);
   const [priceInfo, setPriceInfo] = useState<priceInformation>({price: 0, priceDelta: 0, percentIncrease: 0})
   const [symbolInfo, setSymbolInfo] = useState<symbolInformation>({name : "-----", symbol: "---" })
+  const [minValue, setMinValue] = useState("100");
+  const [maxValue, setMaxValue] = useState("500");
   
   const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
     const currentStock : stockInformation = {
@@ -154,7 +154,7 @@ const dashboard = () => {
 
   return (
       <View>
-        <DashBoardHeader/>
+        <DashBoardHeader min={minValue} setMin = {setMinValue} max={maxValue} setMax={setMaxValue}/>
         <Symbol name={symbolInfo.name} symbol={symbolInfo.symbol}/>        
         <PriceDisplay price={priceInfo.price} priceDelta={priceInfo.priceDelta} percentIncrease={priceInfo.percentIncrease}/>
         <BasicChart chartData={dataState}/>
