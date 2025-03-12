@@ -1,7 +1,7 @@
 import React from "react";
 import {View, Text, Button, Image, TouchableOpacity, TextInput, StyleSheet} from "react-native";
 import {Link} from "expo-router";
-import Icon from '@react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 interface dbHeaderProps{
   min: number;
@@ -22,10 +22,10 @@ const dbHeader = ({min, max, setMin, setMax}: dbHeaderProps ) => {
           />
         </View>
 
-          {/* <Link href={{ pathname:'/settings', query: {min: min, max: max, setMin, setMax}}}>
-
-          </Link> */}
+          <Link href={{ pathname:'/settings', query: {min: min, max: max, setMin, setMax}}}>
           <Icon name="gear" size={25} color="#000" />
+          </Link>
+          
 
       </View>
     );
