@@ -16,7 +16,7 @@ const formatDateISO = (date: Date) => {
     return formattedDate;
 };
 
-const rest = restClient(process.env.POLY_API_KEY);
+const rest = restClient("8W1AIBVUlCB6VhhFFZdwtFFF_8Rfvn9B");
 
 /**
  * Fetches the stock data of the current date.
@@ -105,3 +105,42 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
     }
     return stockAggregate;
 }
+
+/**
+ * Searches for stock tickers that match the user's query.
+ *
+ * @param query - The stock ticker or company name to search for.
+ * @returns A list of matching stock symbols (up to 5 results).
+ */
+export const searchStockTickers = async (query: string): Promise<string[]> => {
+    if (!query.trim()) return [];
+  
+    try {
+      console.log("Fetching stock tickers for:", query);
+  
+      const response = await rest.reference.tickers({
+        search: query.toUpperCase(),
+        active: true,
+        limit: 5,
+      });
+  
+      if (response && response.results) {
+        return response.results.map((ticker) => ticker.ticker);
+      }
+  
+      return [];
+    } catch (error: any) {
+      // Check if error has a response object and log more information
+      console.error("Error fetching stock tickers:", error.response ? error.response.data : error.message);
+  
+      // Handle rate limit errors (HTTP 429)
+      if (error.response?.status === 429) {
+        console.warn("Rate limit exceeded. Retrying in 2 seconds...");
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds
+        return searchStockTickers(query); // Retry the request
+      }
+  
+      // Return more detailed error info to be displayed to the user
+      throw new Error(error.response?.data || error.message || "Error fetching stock data. Please try again later.");
+    }
+  };
