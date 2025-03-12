@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react";  
 import {View, Text, StyleSheet, Pressable} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import RNFS from 'react-native-fs';
@@ -7,7 +7,7 @@ import { Link } from "expo-router";
 const About = () => {
     return (
         <View>
-            <Link href="../dashboard" asChild>
+            <Link href="/dashboard" asChild>
                 <Pressable>
                     <Ionicons style={styles.backButton} name="arrow-back" size={30} color={"black"} />
                 </Pressable>
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
         paddingLeft : 15,
         paddingTop : 15
     },
-
+    
     headline : {
         paddingLeft: 40,
         paddingTop: 40,

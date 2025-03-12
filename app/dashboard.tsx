@@ -1,36 +1,38 @@
 import React from "react";
-import {View, Button} from "react-native";
+import {View, Text, Button, Image, TouchableOpacity, TextInput, StyleSheet} from "react-native";
 import {Link} from "expo-router";
 import DashBoardHeader from '@/components/DashBoardHeader';
 import BasicChart from '@/components/BasicChart';
 import Symbol from '@/components/Symbol';
-import PriceDisplay from '@/components/PriceDisplay';
+import PriceDisplay from '@/components/PriceDispaly';
 import History from '@/components/HistoryExample'
 import {useState, useEffect} from "react"
-import { setData, getData } from '../services/stock-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 type historyObject = {
-  dateOccurrence : Date,
+  dateOccurance : Date,
   isPositive: boolean,
-  priceDifference : number
+  priceDifference : number 
 }
 const createFakeHistory : historyObject[] = [
       {
-        dateOccurrence : new Date('2025-01-01'),
-
+        dateOccurance : new Date('2025-01-01'),
+      
         isPositive: true,
-        priceDifference : 4.00
+        priceDifference : 4.00 
     },
     {
-      dateOccurrence : new Date('2025-01-28'),
-
+      dateOccurance : new Date('2025-01-28'),
+     
       isPositive: false,
-      priceDifference : 2.00
-    },
+      priceDifference : 2.00 
+    }, 
     {
-      dateOccurrence : new Date('2025-02-14'),
+      dateOccurance : new Date('2025-02-14'),
       isPositive: true,
-      priceDifference : 4.80
+      priceDifference : 4.80 
     }
   ]
 
@@ -45,13 +47,33 @@ type symbolInformation = {
   symbol: string;
 }
 
-export interface stockInformation {
+interface stockInformation{
   priceI : priceInformation;
   symbolI: symbolInformation;
   graphP: number[];
   min: number;
   max: number;
 }
+
+const saveData = async (key : string, data: stockInformation ) => {
+  try {
+    const jsonData = JSON.stringify(data);
+    await AsyncStorage.setItem(key, jsonData);
+    console.log("data updated");
+  } catch (error) {
+    console.error("Error saving data:", error);
+  }
+}
+
+const getData = async (key: string): Promise<stockInformation | null> => {
+  try {
+    const jsonData = await AsyncStorage.getItem(key);
+    return jsonData != null ? JSON.parse(jsonData) : null;
+  } catch (error) {
+    console.error("Error retrieving data:", error);
+    return null;
+  }
+};
 
 const dashboard = () => {
 
@@ -60,7 +82,7 @@ const dashboard = () => {
   const [symbolInfo, setSymbolInfo] = useState<symbolInformation>({name : "-----", symbol: "---" })
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
-
+  
   const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
     const currentStock : stockInformation = {
       priceI : priceInfo,
@@ -75,32 +97,30 @@ const dashboard = () => {
   useEffect(() => {
     getData('userStockInfo').then(value => {
       if(value) {
-        console.log("Success! values retrieved from storage");
+        console.log("Success! values retreived from storage");
         setDataState(value.graphP);
         setPriceInfo(value.priceI);
         setSymbolInfo(value.symbolI);
         setMinValue(value.min);
         setMaxValue(value.max);
       }
-
+       
       updateCurrentStockInfo();
     }
   )}, []);
-
+ 
   function updateCurrentStockInfo(): void{
     const currentStock : stockInformation = {
-      priceI: priceInfo,
+      priceI : priceInfo,
       symbolI: symbolInfo,
-      graphP: dataState,
-      min: 0,
-      max: 0
-    }
+      graphP: dataState
+     }
 
      //@TODO **************check thresholds for min / max; **********************************
 
 
      setCurrentStockInfo(currentStock);
-     setData('userStockInfo', currentStockInfo);
+     saveData('userStockInfo', currentStockInfo);
   }
 
 
@@ -123,7 +143,7 @@ const dashboard = () => {
     updateCurrentStockInfo();
   }
 
-  function addMockData(){
+  function addMOckData(){
     const num = (Math.random() * (600 - 400 + 1)) + 400;
     addPrice(num);
   }
@@ -136,21 +156,21 @@ const dashboard = () => {
     };
     updateCurrentStockInfo
   }
-
+  
 
   return (
       <View>
-        <DashBoardHeader min={minValue} setMin={setMinValue} max={maxValue} setMax={setMaxValue}/>
-        <Symbol name={symbolInfo.name} symbol={symbolInfo.symbol}/>
+        <DashBoardHeader min={minValue} setMin = {setMinValue} max={maxValue} setMax={setMaxValue}/>
+        <Symbol name={symbolInfo.name} symbol={symbolInfo.symbol}/>        
         <PriceDisplay price={priceInfo.price} priceDelta={priceInfo.priceDelta} percentIncrease={priceInfo.percentIncrease}/>
         <BasicChart chartData={dataState}/>
         <History historyList = {createFakeHistory}/>
-        <Button title="Add MOck Data" onPress={addMockData} />
+        <Button title="Add MOck Data" onPress={addMOckData} />
         <Button title="clear data" onPress={clearData} />
-        <Link href="../about">to About</Link>
+        <Link href={"/about"}>to About</Link>
       </View>
     );
   };
-
+  
 
   export default dashboard;
