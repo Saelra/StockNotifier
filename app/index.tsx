@@ -6,10 +6,10 @@ const Landing = () => {
   return (
    <>
    <Text>Hello World!</Text>
-   <Link href={"/dashboard"}>to the Dashboard</Link>
+   <Link href="../dashboard">to the Dashboard</Link>
    </>
-     
-    
+
+
   );
 }
 
