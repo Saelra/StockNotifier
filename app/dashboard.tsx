@@ -60,6 +60,12 @@ const dashboard = () => {
   const [symbolInfo, setSymbolInfo] = useState<symbolInformation>({name : "-----", symbol: "---" })
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
+  const [ticker, setTicker] = useState<string | null>(null);
+
+  const handleTickerDataSelect = (data: string) => {
+    console.log("Selected Ticker:", data);
+    setTicker(data);
+  };
 
   const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
     const currentStock : stockInformation = {
@@ -140,7 +146,7 @@ const dashboard = () => {
 
   return (
       <View>
-        <DashBoardHeader min={minValue} setMin={setMinValue} max={maxValue} setMax={setMaxValue}/>
+        <DashBoardHeader onTickerDataSelect={handleTickerDataSelect} />
         <Symbol name={symbolInfo.name} symbol={symbolInfo.symbol}/>
         <PriceDisplay price={priceInfo.price} priceDelta={priceInfo.priceDelta} percentIncrease={priceInfo.percentIncrease}/>
         <BasicChart chartData={dataState}/>
