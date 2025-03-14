@@ -8,6 +8,7 @@ import PriceDisplay from '@/components/PriceDisplay';
 import History from '@/components/HistoryExample'
 import {useState, useEffect} from "react"
 import { setData, getData } from '../services/stock-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type historyObject = {
   dateOccurrence : Date,
@@ -60,12 +61,47 @@ const dashboard = () => {
   const [symbolInfo, setSymbolInfo] = useState<symbolInformation>({name : "-----", symbol: "---" })
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
-  const [ticker, setTicker] = useState<string | null>(null);
+  const [historyList, setHistoryList] = useState<historyObject[] | null>(createFakeHistory);
+  const [ticker, setTicker] = useState<string >("appl");
 
   const handleTickerDataSelect = (data: string) => {
-    console.log("Selected Ticker:", data);
     setTicker(data);
+    const newSymbolInformation: symbolInformation = {
+      name: 'need API return name',
+      symbol: data
+    }
+    changeSymbol(newSymbolInformation);
   };
+
+  const setHistoryData = async (key : string, data: historyObject[]  ) => {
+  try {
+    const jsonData = JSON.stringify(data);
+    await AsyncStorage.setItem(key, jsonData);
+    console.log(`Data has been saved to ${key}.`);
+  } catch (error) {
+    console.error(`Error saving data to ${key}:`, error);
+  }
+}
+
+const getHistoryData = async (key: string): Promise<historyObject[] | null> => {
+  try {
+    const jsonData = await AsyncStorage.getItem(key);
+    return jsonData != null ? JSON.parse(jsonData) : null;
+  } catch (error) {
+    console.error(`Error getting data from ${key}:`, error);
+    return null;
+  }
+}
+
+  function changeSymbol(sym: symbolInformation):void {
+    clearData();
+    updateCurrentStockInfo();
+    setSymbolInfo({name: sym.name, symbol: sym.symbol})
+    //pull from history the history :)
+    //setHistoryList(getHistoryData(sym.symbol))
+    updateCurrentStockInfo();
+    
+  }
 
   const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
     const currentStock : stockInformation = {
@@ -79,6 +115,7 @@ const dashboard = () => {
   })
 
   useEffect(() => {
+    console.log("useEffect active"); //remove me for production!
     getData('userStockInfo').then(value => {
       if(value) {
         console.log("Success! values retrieved from storage");
@@ -87,9 +124,11 @@ const dashboard = () => {
         setSymbolInfo(value.symbolI);
         setMinValue(value.min);
         setMaxValue(value.max);
+        
+      } else{
+        updateCurrentStockInfo();
       }
 
-      updateCurrentStockInfo();
     }
   )}, []);
 
@@ -98,21 +137,32 @@ const dashboard = () => {
       priceI: priceInfo,
       symbolI: symbolInfo,
       graphP: dataState,
-      min: 0,
-      max: 0
+      min: minValue,
+      max: maxValue
     }
-
-     //@TODO **************check thresholds for min / max; **********************************
-
-
+    console.log(currentStock);
      setCurrentStockInfo(currentStock);
      setData('userStockInfo', currentStockInfo);
   }
 
+  function addNewHistoryObject(price: number, threshold: number, priceDelta: number): void {
+      const newHistoryObject : historyObject  = {
+        dateOccurrence: new Date(),
+        isPositive: (price > threshold),
+        priceDifference: Math.abs(price - priceDelta)
+      };
+      const newHistoryList: historyObject[] = [newHistoryObject, ...historyList]
+      
+      //only keep the last 10 History objects. 
+      if(newHistoryList.length > 4){ 
+        newHistoryList.shift();
+      }
+      setHistoryList(newHistoryList);
+  }
 
   function addPrice(newStockPrice : number) : void {
     const newArray = [...dataState, newStockPrice];
-    if(dataState.length > 100){
+    if(dataState.length > 30){
       newArray.shift();
     }
 
@@ -123,6 +173,14 @@ const dashboard = () => {
       priceDelta : (priceInfo.price - newStockPrice),
       percentIncrease : (Math.abs(priceInfo.price - newStockPrice) / newStockPrice) * 100
     }
+
+    //check for min and max 
+    if(newPriceInfo.price > maxValue){
+      addNewHistoryObject(newPriceInfo.price, maxValue, newPriceInfo.priceDelta)
+    }else if(newPriceInfo.price < minValue){
+      addNewHistoryObject(newPriceInfo.price, minValue, newPriceInfo.priceDelta)
+    }
+    
 
     setPriceInfo(newPriceInfo);
 
@@ -140,17 +198,25 @@ const dashboard = () => {
       priceDelta: 0,
       percentIncrease: 0
     };
-    updateCurrentStockInfo
+    const dataI : number[] = [];
+    const symbolI : symbolInformation= {
+      name: "----",
+      symbol: "----"
+    }
+    setHistoryList([]);
+    setSymbolInfo(symbolI);
+    setPriceInfo(priceI);
+    updateCurrentStockInfo();
   }
 
 
   return (
       <View>
-        <DashBoardHeader onTickerDataSelect={handleTickerDataSelect} />
+        <DashBoardHeader onTickerDataSelect={handleTickerDataSelect}/>
         <Symbol name={symbolInfo.name} symbol={symbolInfo.symbol}/>
         <PriceDisplay price={priceInfo.price} priceDelta={priceInfo.priceDelta} percentIncrease={priceInfo.percentIncrease}/>
         <BasicChart chartData={dataState}/>
-        <History historyList = {createFakeHistory}/>
+        <History historyList = {historyList}/>
         <Button title="Add MOck Data" onPress={addMockData} />
         <Button title="clear data" onPress={clearData} />
         <Link href="../about">to About</Link>
