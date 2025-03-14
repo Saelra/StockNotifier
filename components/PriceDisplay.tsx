@@ -24,11 +24,11 @@ const PriceDisplay = ({ price, priceDelta, percentIncrease }: PriceProps) => {
       <View style={styles.priceContainer}>
         <Text style={styles.currentPrice}>${price.toFixed(2)}</Text>
         <Ionicons
-            name={priceDelta >= 0 ? "arrow-up-outline" : "arrow-down-outline"}
+            name={priceDelta <= 0 ? "arrow-up-outline" : "arrow-down-outline"}
             size={15}
-            color={priceDelta >= 0 ? "green" : "red"}
+            color={priceDelta <= 0 ? "green" : "red"}
         />
-        <Text style={{ color: priceDelta >= 0 ? "green" : "red" }}>
+        <Text style={{ color: priceDelta <= 0 ? "green" : "red" }}>
             {priceDelta >= 0 ? "+" : ""}${priceDelta.toFixed(2)} ({percentIncrease.toFixed(2)}%)
         </Text>
       </View>
