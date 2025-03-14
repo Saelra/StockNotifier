@@ -24,6 +24,7 @@ const History : React.FC<HistoryProps> = ({historyList}) => {
             <FlatList
                 data={historyList}
                 renderItem={({item}) => <HistoryItem hDate={item.dateOccurrence}  isPositive={item.isPositive} priceDifference={item.priceDifference} />}
+                inverted
             />
         </>
 

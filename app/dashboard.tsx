@@ -61,7 +61,7 @@ const dashboard = () => {
   const [symbolInfo, setSymbolInfo] = useState<symbolInformation>({name : "-----", symbol: "---" })
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
-  const [historyList, setHistoryList] = useState<historyObject[] | null>(createFakeHistory);
+  const [historyList, setHistoryList] = useState<historyObject[]>(createFakeHistory);
   const [ticker, setTicker] = useState<string >("appl");
 
   const handleTickerDataSelect = (data: string) => {
@@ -74,41 +74,41 @@ const dashboard = () => {
   };
 
   const setHistoryData = async (key : string, data: historyObject[]  ) => {
-  try {
-    const jsonData = JSON.stringify(data);
-    await AsyncStorage.setItem(key, jsonData);
-    console.log(`Data has been saved to ${key}.`);
-  } catch (error) {
-    console.error(`Error saving data to ${key}:`, error);
+    try {     
+      const jsonData = JSON.stringify(data);
+      await AsyncStorage.setItem(key, jsonData);
+      console.log(`Data has been saved to ${key}.`);
+    } catch (error) {
+      console.error(`Error saving data to ${key}:`, error);
+    }
   }
-}
 
-const getHistoryData = async (key: string): Promise<historyObject[] | null> => {
-  try {
-    const jsonData = await AsyncStorage.getItem(key);
-    return jsonData != null ? JSON.parse(jsonData) : null;
-  } catch (error) {
-    console.error(`Error getting data from ${key}:`, error);
-    return null;
+  const getHistoryData = async (key: string): Promise<historyObject[] | null> => {
+    try {
+      const jsonData = await AsyncStorage.getItem(key);
+      return jsonData != null ? JSON.parse(jsonData) : null;
+    } catch (error) {
+      console.error(`Error getting data from ${key}:`, error);
+      return null;
+    }
   }
-}
 
   function changeSymbol(sym: symbolInformation):void {
-    // clearData();
-    // updateCurrentStockInfo();
+    clearData();
+    updateCurrentStockInfo();
     setSymbolInfo({name: sym.name, symbol: sym.symbol})
     //pull from history the history :)
-    //setHistoryList(getHistoryData(sym.symbol))
-    // updateCurrentStockInfo();
+    
+    
+    updateCurrentStockInfo();
     
   }
-
-  // useEffect will be triggered every time `symbolInfo` changes
-  useEffect(() => {
-    if (symbolInfo.symbol !== "---") { // check if symbolInfo is properly updated
-      updateCurrentStockInfo();
-    }
-  }, [symbolInfo]);
+  // // useEffect will be triggered every time `symbolInfo` changes
+  // useEffect(() => {
+  //   if (symbolInfo.symbol !== "---") { // check if symbolInfo is properly updated
+  //     updateCurrentStockInfo();
+  //   }
+  // }, [symbolInfo]);
 
   const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
     const currentStock : stockInformation = {
@@ -149,8 +149,7 @@ const getHistoryData = async (key: string): Promise<historyObject[] | null> => {
     }
     console.log(currentStock);
      setCurrentStockInfo(currentStock);
-    //  setData('userStockInfo', currentStockInfo);
-    setData('userStockInfo', currentStock);
+     setData('userStockInfo', currentStockInfo);
   }
 
   function addNewHistoryObject(price: number, threshold: number, priceDelta: number): void {
@@ -159,7 +158,7 @@ const getHistoryData = async (key: string): Promise<historyObject[] | null> => {
         isPositive: (price > threshold),
         priceDifference: Math.abs(price - priceDelta)
       };
-      const newHistoryList: historyObject[] = [newHistoryObject, ...historyList]
+      const newHistoryList: historyObject[] = [...historyList,newHistoryObject]
       
       //only keep the last 10 History objects. 
       if(newHistoryList.length > 4){ 
@@ -169,7 +168,7 @@ const getHistoryData = async (key: string): Promise<historyObject[] | null> => {
   }
 
   function addPrice(newStockPrice : number) : void {
-    const newArray = [...dataState, newStockPrice];
+    const newArray = [ newStockPrice, ...dataState];
     if(dataState.length > 30){
       newArray.shift();
     }
