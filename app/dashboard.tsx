@@ -94,14 +94,21 @@ const getHistoryData = async (key: string): Promise<historyObject[] | null> => {
 }
 
   function changeSymbol(sym: symbolInformation):void {
-    clearData();
-    updateCurrentStockInfo();
+    // clearData();
+    // updateCurrentStockInfo();
     setSymbolInfo({name: sym.name, symbol: sym.symbol})
     //pull from history the history :)
     //setHistoryList(getHistoryData(sym.symbol))
-    updateCurrentStockInfo();
+    // updateCurrentStockInfo();
     
   }
+
+  // useEffect will be triggered every time `symbolInfo` changes
+  useEffect(() => {
+    if (symbolInfo.symbol !== "---") { // check if symbolInfo is properly updated
+      updateCurrentStockInfo();
+    }
+  }, [symbolInfo]);
 
   const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
     const currentStock : stockInformation = {
@@ -142,7 +149,8 @@ const getHistoryData = async (key: string): Promise<historyObject[] | null> => {
     }
     console.log(currentStock);
      setCurrentStockInfo(currentStock);
-     setData('userStockInfo', currentStockInfo);
+    //  setData('userStockInfo', currentStockInfo);
+    setData('userStockInfo', currentStock);
   }
 
   function addNewHistoryObject(price: number, threshold: number, priceDelta: number): void {
