@@ -13,7 +13,6 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
   const [filteredTickers, setFilteredTickers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -47,7 +46,6 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
 
   const handleTickerSelect = (ticker: string) => {
     setSearchQuery(""); // Clear the search query after selecting the ticker
-    setSelectedTicker(ticker);
     onTickerDataSelect(ticker);
     setFilteredTickers([]); // Clear the suggestions after selection
   };
@@ -97,11 +95,9 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
         </View>
       )}
 
-      {/* Use Link to pass selectedTicker to the Settings screen */}
       <Link
         href={{
           pathname: "/settings",  // Path to Settings screen
-          params: { ticker: selectedTicker },  // Dynamically pass selectedTicker
         }}
       >
         <Icon name="cog" size={24} color="#000" style={styles.settingsIcon} />
