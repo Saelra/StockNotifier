@@ -3,24 +3,32 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { stockInformation } from './dashboard';
 
-interface SettingsProps {
-  route?: {
-    params?: {
-      ticker: string;
-      min: number;
-      max: number;
-    };
-  };
-}
-
-const Settings: React.FC<SettingsProps> = ({ route }) => {
-  // Extract ticker, min, and max from route params
-  const { ticker = 'DEFAULT', min: initialMin = 0, max: initialMax = 100 } = route?.params || {};
-
-  const [minPercentage, setMinPercentage] = useState<number>(initialMin);
-  const [maxPercentage, setMaxPercentage] = useState<number>(initialMax);
+const Settings: React.FC = () => {
+  const [stockInfo, setStockInfo] = useState<stockInformation | null>(null);
+  const [minPercentage, setMinPercentage] = useState<number>(0);
+  const [maxPercentage, setMaxPercentage] = useState<number>(50);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchStockInfo = async () => {
+      try {
+        // Retrieve stock information from AsyncStorage
+        const stockData = await AsyncStorage.getItem('userStockInfo');
+        if (stockData) {
+          const parsedStock: stockInformation = JSON.parse(stockData);
+          setStockInfo(parsedStock);
+        }
+      } catch (error) {
+        console.error('Error retrieving stock information:', error);
+      }
+    };
+
+    fetchStockInfo();
+  }, []);
+
+  const ticker = stockInfo?.symbolI?.symbol || "N/A";
 
   useEffect(() => {
     const fetchValues = async () => {
@@ -36,7 +44,7 @@ const Settings: React.FC<SettingsProps> = ({ route }) => {
       }
     };
     fetchValues();
-  }, [ticker]);
+  }, [stockInfo]);
 
   const handleSave = async () => {
     try {
@@ -101,5 +109,3 @@ const styles = StyleSheet.create({
     height: 40,
   },
 });
-
-export default Settings;
