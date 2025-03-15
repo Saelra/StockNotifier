@@ -15,6 +15,10 @@ type historyObject = {
   isPositive: boolean,
   priceDifference : number
 }
+
+interface historyObjectLIst = {
+  historyList : hist
+}
 const createFakeHistory : historyObject[] = [
       {
         dateOccurrence : new Date('2025-01-01'),
