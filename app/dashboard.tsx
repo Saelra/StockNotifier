@@ -15,6 +15,8 @@ type historyObject = {
   isPositive: boolean,
   priceDifference : number
 }
+
+
 const createFakeHistory : historyObject[] = [
       {
         dateOccurrence : new Date('2025-01-01'),
@@ -56,12 +58,12 @@ export interface stockInformation {
 
 const dashboard = () => {
 
-  const [dataState, setDataState] = useState([0, 200, 300, 400, 500]);
+  const [dataState, setDataState] = useState([0]);
   const [priceInfo, setPriceInfo] = useState<priceInformation>({price: 0, priceDelta: 0, percentIncrease: 0})
   const [symbolInfo, setSymbolInfo] = useState<symbolInformation>({name : "-----", symbol: "---" })
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
-  const [historyList, setHistoryList] = useState<historyObject[]>(createFakeHistory);
+  const [historyList, setHistoryList] = useState<historyObject[]>([]);
   const [ticker, setTicker] = useState<string >("appl");
 
   const handleTickerDataSelect = (data: string) => {
@@ -83,32 +85,26 @@ const dashboard = () => {
     }
   }
 
-  const getHistoryData = async (key: string): Promise<historyObject[] | null> => {
+  const getHistoryData = async (key: string): Promise<historyObject[] > => {
     try {
       const jsonData = await AsyncStorage.getItem(key);
-      return jsonData != null ? JSON.parse(jsonData) : null;
+      return jsonData != null ? JSON.parse(jsonData) : [];
     } catch (error) {
       console.error(`Error getting data from ${key}:`, error);
-      return null;
+      return [];
     }
   }
 
   function changeSymbol(sym: symbolInformation):void {
+    setHistoryData(sym.symbol,historyList);
     clearData();
-    updateCurrentStockInfo();
-    setSymbolInfo({name: sym.name, symbol: sym.symbol})
+    console.log("getting history data");
+    setSymbolInfo(sym);
     //pull from history the history :)
-    
-    
+   
     updateCurrentStockInfo();
     
   }
-  // // useEffect will be triggered every time `symbolInfo` changes
-  // useEffect(() => {
-  //   if (symbolInfo.symbol !== "---") { // check if symbolInfo is properly updated
-  //     updateCurrentStockInfo();
-  //   }
-  // }, [symbolInfo]);
 
   const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
     const currentStock : stockInformation = {
@@ -131,6 +127,8 @@ const dashboard = () => {
         setSymbolInfo(value.symbolI);
         setMinValue(value.min);
         setMaxValue(value.max);
+        // getHistoryData(value.symbolI.symbol)
+        // .then(hValue => {setHistoryList(hValue)})
         
       } else{
         updateCurrentStockInfo();
@@ -168,7 +166,14 @@ const dashboard = () => {
   }
 
   function addPrice(newStockPrice : number) : void {
-    const newArray = [ newStockPrice, ...dataState];
+    let newArray : number[] = [...dataState, newStockPrice];
+    if(dataState.indexOf(0) === 0){
+      newArray = [newStockPrice];
+    }else {
+      newArray = [...dataState, newStockPrice];
+    }
+
+
     if(dataState.length > 30){
       newArray.shift();
     }
@@ -210,10 +215,11 @@ const dashboard = () => {
       name: "----",
       symbol: "----"
     }
+    setDataState([0]);
     setHistoryList([]);
     setSymbolInfo(symbolI);
     setPriceInfo(priceI);
-    updateCurrentStockInfo();
+    
   }
 
 

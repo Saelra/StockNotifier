@@ -15,7 +15,9 @@ interface HistoryProps {
 
 
 const History : React.FC<HistoryProps> = ({historyList}) => {
-    return (
+
+
+    if(historyList[0] !== null){return (
         <>
             <SafeAreaView style={styles.historyHeader}>
                 <Text style={styles.header}> Price Notification History </Text>
@@ -29,6 +31,11 @@ const History : React.FC<HistoryProps> = ({historyList}) => {
         </>
 
     );
+}else {return (
+    <>
+    <Text style={styles.header}> No History Avaiable</Text>
+    </>
+)}
 }
 
 //<HistoryItem hDate={new Date()} description="stock price above threshold by $5.36" positive={true}/>
