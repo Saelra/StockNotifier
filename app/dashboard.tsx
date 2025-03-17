@@ -238,7 +238,6 @@ const dashboard = () => {
         <Button title="Add MOck Data" onPress={addMockData} />
         <Button title="clear data" onPress={clearData} />
         <Link href="../about">to About</Link>
-        <Link href="../settings">to About</Link>
       </View>
     );
   };
