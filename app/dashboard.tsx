@@ -76,7 +76,7 @@ const dashboard = () => {
   };
 
   const setHistoryData = async (key : string, data: historyObject[]  ) => {
-    try {     
+    try {
       const jsonData = JSON.stringify(data);
       await AsyncStorage.setItem(key, jsonData);
       console.log(`Data has been saved to ${key}.`);
@@ -102,7 +102,7 @@ const dashboard = () => {
     setSymbolInfo(sym);
     //pull from history the history :)
     // updateCurrentStockInfo();
-    
+
   }
 
   useEffect(() => {
@@ -124,8 +124,8 @@ const dashboard = () => {
 
   useEffect(() => {
     console.log("useEffect active"); //remove me for production!
-    getData('userStockInfo').then(value => {
-      if(value) {
+    getData<stockInformation>('userStockInfo').then(value => {
+      if (value) {
         console.log("Success! values retrieved from storage");
         setDataState(value.graphP);
         setPriceInfo(value.priceI);
@@ -134,7 +134,7 @@ const dashboard = () => {
         setMaxValue(value.max);
         // getHistoryData(value.symbolI.symbol)
         // .then(hValue => {setHistoryList(hValue)})
-        
+
       } else{
         updateCurrentStockInfo();
       }
@@ -162,9 +162,9 @@ const dashboard = () => {
         priceDifference: Math.abs(price - priceDelta)
       };
       const newHistoryList: historyObject[] = [...historyList,newHistoryObject]
-      
-      //only keep the last 10 History objects. 
-      if(newHistoryList.length > 4){ 
+
+      //only keep the last 10 History objects.
+      if(newHistoryList.length > 4){
         newHistoryList.shift();
       }
       setHistoryList(newHistoryList);
@@ -191,13 +191,13 @@ const dashboard = () => {
       percentIncrease : (Math.abs(priceInfo.price - newStockPrice) / newStockPrice) * 100
     }
 
-    //check for min and max 
+    //check for min and max
     if(newPriceInfo.price > maxValue){
       addNewHistoryObject(newPriceInfo.price, maxValue, newPriceInfo.priceDelta)
     }else if(newPriceInfo.price < minValue){
       addNewHistoryObject(newPriceInfo.price, minValue, newPriceInfo.priceDelta)
     }
-    
+
 
     setPriceInfo(newPriceInfo);
 
@@ -224,7 +224,7 @@ const dashboard = () => {
     setHistoryList([]);
     setSymbolInfo(symbolI);
     setPriceInfo(priceI);
-    
+
   }
 
 

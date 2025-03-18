@@ -19,7 +19,7 @@ const Landing: React.FC = () => {
         <Text style={styles.title}>Stock Notifier</Text>
         <Text style={styles.subheading}>Easily keep track{'\n'}of stock prices</Text>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.button, styles.buttonLeft]} onPress={() => navigateTo('/dashboard')}>
+          <TouchableOpacity style={[styles.button, styles.buttonLeft]} onPress={() => navigateTo('/detail')}>
             <Text style={[styles.buttonText, styles.buttonLeftText]}>Get Started</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.buttonRight]} onPress={() => navigateTo('/about')}>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject, // To cover the entire ImageBackground.
+    ...StyleSheet.absoluteFillObject, // Fill ImageBackground.
     backgroundColor: 'rgba(250, 248, 255, 0.66)',
   },
   container: {
