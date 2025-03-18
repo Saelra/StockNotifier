@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, TextInput, FlatList, TouchableOpacity, StyleSheet, Text } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { searchStockTickers } from "../services/stock-api";
-import { Link } from "expo-router";  // Import Link from expo-router
+import { useRouter } from "expo-router";  // Import Link from expo-router
 
 interface dbHeaderProps {
   onTickerDataSelect: (data: string) => void;
@@ -13,6 +13,7 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
   const [filteredTickers, setFilteredTickers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const router = useRouter();  
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -48,6 +49,10 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
     setSearchQuery(""); // Clear the search query after selecting the ticker
     onTickerDataSelect(ticker);
     setFilteredTickers([]); // Clear the suggestions after selection
+  };
+
+  const goToSettings = () => {
+    router.push('/settings');  // Navigate to the settings page
   };
 
   return (
@@ -95,13 +100,11 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
         </View>
       )}
 
-      <Link
-        href={{
-          pathname: "/settings",  // Path to Settings screen
-        }}
-      >
+      <TouchableOpacity onPress={goToSettings}>
         <Icon name="cog" size={24} color="#000" style={styles.settingsIcon} />
-      </Link>
+      </TouchableOpacity>
+    
+
     </View>
   );
 };

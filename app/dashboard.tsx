@@ -101,10 +101,15 @@ const dashboard = () => {
     console.log("getting history data");
     setSymbolInfo(sym);
     //pull from history the history :)
-   
-    updateCurrentStockInfo();
+    // updateCurrentStockInfo();
     
   }
+
+  useEffect(() => {
+    if (symbolInfo.symbol !== "---") { // check if symbolInfo is properly updated
+      updateCurrentStockInfo();
+    }
+  }, [symbolInfo]);
 
   const [currentStockInfo, setCurrentStockInfo] = useState<stockInformation>(() => {
     const currentStock : stockInformation = {
@@ -147,7 +152,7 @@ const dashboard = () => {
     }
     console.log(currentStock);
      setCurrentStockInfo(currentStock);
-     setData('userStockInfo', currentStockInfo);
+     setData('userStockInfo', currentStock);
   }
 
   function addNewHistoryObject(price: number, threshold: number, priceDelta: number): void {
