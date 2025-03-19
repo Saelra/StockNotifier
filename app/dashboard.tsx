@@ -142,13 +142,24 @@ const dashboard = () => {
     }
   )}, []);
 
-  function updateCurrentStockInfo(): void{
+  async function updateCurrentStockInfo(): Promise<void> {
+    // Retrieve min and max values from AsyncStorage
+    const minPrice = await AsyncStorage.getItem(`minPrice-${symbolInfo.symbol}`);
+    const maxPrice = await AsyncStorage.getItem(`maxPrice-${symbolInfo.symbol}`);
+
+    // console.log("Retrieved minPrice:", minPrice);
+    // console.log("Retrieved maxPrice:", maxPrice);
+  
+    // Ensure we parse the values as numbers and handle null values
+    const parsedMinPrice = minPrice ? parseFloat(minPrice) : 0;
+    const parsedMaxPrice = maxPrice ? parseFloat(maxPrice) : 0;
+
     const currentStock : stockInformation = {
       priceI: priceInfo,
       symbolI: symbolInfo,
       graphP: dataState,
-      min: minValue,
-      max: maxValue
+      min: parsedMinPrice,
+      max: parsedMaxPrice
     }
     console.log(currentStock);
      setCurrentStockInfo(currentStock);
