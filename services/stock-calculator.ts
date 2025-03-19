@@ -1,7 +1,7 @@
-export const getCurrentPrice = (input: number): number => {
+// export const getCurrentPrice = (input: number): number => {
 
-	return -1;
-};
+// 	return -1;
+// };
 
 export const getPriceAverage = (input: number): number => {
 
@@ -28,12 +28,12 @@ export const getChangePercentage = (input: number): number => {
 	return -1;
 };
 
-export const getTransactionAmount = (input: number): number => {
+// export const getTransactionAmount = (input: number): number => {
 
-	return -1;
-};
+// 	return -1;
+// };
 
-export const getVolumeAmount = (input: number): number => {
+// export const getVolumeAmount = (input: number): number => {
 
-	return -1;
-};
+// 	return -1;
+// };

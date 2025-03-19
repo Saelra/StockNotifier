@@ -9,6 +9,8 @@ import History from '@/components/HistoryExample'
 import {useState, useEffect} from "react"
 import { setData, getData } from '../services/stock-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import alertNotification, { AlertType } from '../components/priceNotificationElement';
+
 
 type historyObject = {
   dateOccurrence : Date,
@@ -181,7 +183,7 @@ const dashboard = () => {
       setHistoryList(newHistoryList);
   }
 
-  function addPrice(newStockPrice : number) : void {
+  async function addPrice(newStockPrice : number) : Promise<void> {
     let newArray : number[] = [...dataState, newStockPrice];
     if(dataState.indexOf(0) === 0){
       newArray = [newStockPrice];
@@ -203,12 +205,27 @@ const dashboard = () => {
     }
 
     //check for min and max
-    if(newPriceInfo.price > maxValue){
-      addNewHistoryObject(newPriceInfo.price, maxValue, newPriceInfo.priceDelta)
-    }else if(newPriceInfo.price < minValue){
-      addNewHistoryObject(newPriceInfo.price, minValue, newPriceInfo.priceDelta)
+    if (newPriceInfo.price > maxValue) {
+      const userWantsToKeep = await alertNotification({
+        stock: currentStockInfo,
+        threshold: maxValue,
+        alertType: AlertType.High,
+      });
+  
+      if (userWantsToKeep) {
+        addNewHistoryObject(newPriceInfo.price, maxValue, newPriceInfo.priceDelta);
+      }
+    } else if (newPriceInfo.price < minValue) {
+      const userWantsToKeep = await alertNotification({
+        stock: currentStockInfo,
+        threshold: minValue,
+        alertType: AlertType.Low,
+      });
+  
+      if (userWantsToKeep) {
+        addNewHistoryObject(newPriceInfo.price, minValue, newPriceInfo.priceDelta);
+      }
     }
-
 
     setPriceInfo(newPriceInfo);
 
