@@ -52,9 +52,9 @@ const Settings: React.FC = () => {
       try {
         const min = await AsyncStorage.getItem(`minPrice-${ticker}`);
         const max = await AsyncStorage.getItem(`maxPrice-${ticker}`);
-        
         // console.log(`Load Min Price for ${ticker}: $${min}`);
         // console.log(`Load Max Price for ${ticker}: $${max}`);
+        
         setMinPrice(min !== null ? parseFloat(min) : sliderMiddle);
         setMaxPrice(max !== null ? parseFloat(max) : sliderMiddle);
       } catch (error) {
