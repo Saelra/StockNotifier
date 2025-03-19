@@ -52,6 +52,9 @@ const Settings: React.FC = () => {
       try {
         const min = await AsyncStorage.getItem(`minPrice-${ticker}`);
         const max = await AsyncStorage.getItem(`maxPrice-${ticker}`);
+        
+        // console.log(`Load Min Price for ${ticker}: $${min}`);
+        // console.log(`Load Max Price for ${ticker}: $${max}`);
         setMinPrice(min !== null ? parseFloat(min) : sliderMiddle);
         setMaxPrice(max !== null ? parseFloat(max) : sliderMiddle);
       } catch (error) {
@@ -70,6 +73,9 @@ const Settings: React.FC = () => {
       if (minPrice !== null && maxPrice !== null) {
         await AsyncStorage.setItem(`minPrice-${ticker}`, minPrice.toString());
         await AsyncStorage.setItem(`maxPrice-${ticker}`, maxPrice.toString());
+
+        // console.log(`Saved Min Price for ${ticker}: $${minPrice.toFixed(2)}`);
+        // console.log(`Saved Max Price for ${ticker}: $${maxPrice.toFixed(2)}`);
       }
       router.back();
     } catch (error) {
