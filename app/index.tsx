@@ -1,6 +1,6 @@
-import { RelativePathString, useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
+import { RelativePathString, useRouter } from 'expo-router';
 
 const graphImagePath = '../assets/images/graph-image.jpg';
 
@@ -13,17 +13,17 @@ const Landing: React.FC = () => {
   };
 
   return (
-    <ImageBackground source={require(graphImagePath)} resizeMode='cover' style={styles.image}>
+    <ImageBackground source={require(graphImagePath)} style={styles.image}>
       <View style={styles.overlay} />
       <View style={styles.container}>
         <Text style={styles.title}>Stock Notifier</Text>
         <Text style={styles.subheading}>Easily keep track{'\n'}of stock prices</Text>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.buttonLeft} onPress={() => navigateTo('/dashboard')}>
-            <Text style={styles.buttonLeftText}>Get Started</Text>
+          <TouchableOpacity style={[styles.button, styles.buttonLeft]} onPress={() => navigateTo('/dashboard')}>
+            <Text style={[styles.buttonText, styles.buttonLeftText]}>Get Started</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonRight} onPress={() => navigateTo('/about')}>
-            <Text style={styles.buttonRightText}>About Us</Text>
+          <TouchableOpacity style={[styles.button, styles.buttonRight]} onPress={() => navigateTo('/about')}>
+            <Text style={[styles.buttonText, styles.buttonRightText]}>About Us</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -35,9 +35,10 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
     justifyContent: 'center',
+    resizeMode: 'cover',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject, // To cover the entire ImageBackground.
+    ...StyleSheet.absoluteFillObject, // Fill ImageBackground.
     backgroundColor: 'rgba(250, 248, 255, 0.66)',
   },
   container: {
@@ -57,23 +58,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 20,
   },
-  buttonLeft: {
-    backgroundColor: '#16a34a',
+  button: {
     padding: 10,
     borderRadius: 5,
+  },
+  buttonLeft: {
+    backgroundColor: '#16a34a',
   },
   buttonRight: {
     backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 5,
+  },
+  buttonText: {
+    fontSize: 16,
   },
   buttonLeftText: {
     color: '#fff',
-    fontSize: 16,
   },
   buttonRightText: {
     color: '#000',
-    fontSize: 16,
   }
 });
 
