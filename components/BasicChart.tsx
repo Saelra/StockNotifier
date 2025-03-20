@@ -4,32 +4,48 @@ import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 
 type chartProp = {
-  chartData: number[];
+  stockPrices: number[];
+  priceDates?: string[];
   chartWidth?: number;
   chartHeight?: number;
 };
 
-function calculateChartLabels(data: number[]): string[] {
-  let chartLabels: string[] = [];
-  if (data.length === 0 || data.length === null) {
-    return [];
-  } else {
-    for (let i = data.length; i < 0; i--) {
-      chartLabels[i - 1] = i.toString();
-    }
+function getKeyElements<T>(arr: T[]): T[] {
+
+  const n = arr.length;
+
+  // Arrays with three elements or less can be returned as-is
+  if (n <= 3) {
+      return arr;
   }
-  return chartLabels;
+  // Calculate potential middle index
+  const middleIndex = Math.floor(n / 2);
+  const result: T[] = [];
+
+  // Always include the first element
+  result.push(arr[0]);
+
+  // Include the true middle element if it exists
+  if (n % 2 === 1) {
+      result.push(arr[middleIndex]);
+  }
+  // Always include the last element
+  result.push(arr[n - 1]);
+
+  // Ensure we don't exceed five elements
+  return result.slice(0, 5);
 }
 
-const ChartObject = ({ chartData, chartWidth, chartHeight }: chartProp) => {
+const ChartObject = ({ stockPrices, priceDates, chartWidth, chartHeight }: chartProp) => {
   return (
     <View>
       <LineChart
         data={{
-          labels: calculateChartLabels(chartData),
+          // Get the key price dates (up to 5 of them to avoid label overlap)
+          labels: getKeyElements(priceDates ?? []),
           datasets: [
             {
-              data: chartData,
+              data: stockPrices,
             },
           ],
         }}
@@ -37,25 +53,18 @@ const ChartObject = ({ chartData, chartWidth, chartHeight }: chartProp) => {
         height={chartHeight ?? Dimensions.get("window").height * 0.3}
         yAxisLabel="$"
         yAxisSuffix="k"
-        yAxisInterval={1} // optional, defaults to 1
         chartConfig={{
-          backgroundColor: "#222",
           backgroundGradientFrom: "#222",
           backgroundGradientTo: "#222",
-          decimalPlaces: 2, // optional, defaults to 2dp
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          style: {
-            borderRadius: 8,
-          },
           propsForDots: {
-            r: "1",
-            strokeWidth: "2",
+            r: 2,
+            strokeWidth: 1,
             stroke: "#fff",
           },
         }}
         style={{
-          marginVertical: 8,
           borderRadius: 8,
         }}
       />

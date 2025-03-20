@@ -47,7 +47,7 @@ const validTimeSpans = ["minute", "hour", "day", "week", "month", "year"];
  * @param {number} [incrementMultiplier=1] - The amount of time per increment (default is 1).
  * @returns {Promise<number[]>} - A promise that resolves to an array of stock prices.
  */
-export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier: number = 1): Promise<number[]> => {
+export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier: number = 1): Promise<[number[], string[]]> => {
 
 	const lowerCaseTimeSpan = timeSpan.toLowerCase().trim();
 
@@ -72,6 +72,7 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 			break;
 	}
 	let stockAggregate: number[] = [];
+	let dateAggregate: string[] = [];
 
 	try {
 		const data = await rest.stocks.aggregates(
@@ -85,14 +86,19 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 		console.log(data);
 
 		if (data.results) {
+			// Create list of stock prices as numbers
 			stockAggregate = data.results
 				.filter(result => result.c !== undefined)
 				.map(result => result.c as number);
+			// Create list of stock dates as strings
+			dateAggregate = data.results
+				.filter(result => result.t !== undefined)
+				.map(result => formatDateISO(new Date(result.t as number * 1000)));
 		}
 	} catch (e) {
 		console.error(e);
 	}
-	return stockAggregate
+	return [stockAggregate, dateAggregate]
 };
 
 /**

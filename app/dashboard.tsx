@@ -1,5 +1,5 @@
 import React from "react";
-import {View, Button} from "react-native";
+import {View, Button, TouchableOpacity} from "react-native";
 import {Link} from "expo-router";
 import DashBoardHeader from '@/components/DashBoardHeader';
 import BasicChart from '@/components/BasicChart';
@@ -149,7 +149,7 @@ const dashboard = () => {
 
     // console.log("Retrieved minPrice:", minPrice);
     // console.log("Retrieved maxPrice:", maxPrice);
-  
+
     // Ensure we parse the values as numbers and handle null values
     const parsedMinPrice = minPrice ? parseFloat(minPrice) : 0;
     const parsedMaxPrice = maxPrice ? parseFloat(maxPrice) : 0;
@@ -244,7 +244,11 @@ const dashboard = () => {
         <DashBoardHeader onTickerDataSelect={handleTickerDataSelect}/>
         <Symbol name={symbolInfo.name} symbol={symbolInfo.symbol}/>
         <PriceDisplay price={priceInfo.price} priceDelta={priceInfo.priceDelta} percentIncrease={priceInfo.percentIncrease}/>
-        <BasicChart chartData={dataState}/>
+        <TouchableOpacity>
+          <Link href="../detail">
+            <BasicChart stockPrices={dataState} />
+          </Link>
+        </TouchableOpacity>
         <History historyList = {historyList}/>
         <Button title="Add MOck Data" onPress={addMockData} />
         <Button title="clear data" onPress={clearData} />
