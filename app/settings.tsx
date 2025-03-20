@@ -41,27 +41,30 @@ const Settings: React.FC = () => {
   // Ticker and current price are derived from stockInfo or set to default values
   const ticker = stockInfo?.symbolI?.symbol || "N/A";
   const currentPrice = stockInfo?.priceI?.price || 100;
-  const sliderMiddle = currentPrice;
+  const sliderMiddle = stockInfo?.priceI?.price || 100;
 
   /**
    * Fetches the saved minimum and maximum price values for the selected ticker
    * from AsyncStorage when the stockInfo is updated.
    */
   useEffect(() => {
-    const fetchValues = async () => {
-      try {
-        const min = await AsyncStorage.getItem(`minPrice-${ticker}`);
-        const max = await AsyncStorage.getItem(`maxPrice-${ticker}`);
-        // console.log(`Load Min Price for ${ticker}: $${min}`);
-        // console.log(`Load Max Price for ${ticker}: $${max}`);
-        
-        setMinPrice(min !== null ? parseFloat(min) : sliderMiddle);
-        setMaxPrice(max !== null ? parseFloat(max) : sliderMiddle);
-      } catch (error) {
-        console.error("Error retrieving values:", error);
-      }
-    };
-    if (stockInfo) fetchValues();
+    if (stockInfo) {
+      const fetchValues = async () => {
+        try {
+          const min = await AsyncStorage.getItem(`minPrice-${ticker}`);
+          const max = await AsyncStorage.getItem(`maxPrice-${ticker}`);
+          // console.log(`Load Min Price for ${ticker}: $${min}`);
+          // console.log(`Load Max Price for ${ticker}: $${max}`);
+
+          setMinPrice(min !== null ? parseFloat(min) : sliderMiddle);
+          setMaxPrice(max !== null ? parseFloat(max) : sliderMiddle);
+        } catch (error) {
+          console.error("Error retrieving values:", error);
+        }
+      };
+
+      fetchValues();
+    }
   }, [stockInfo]);
 
   /**
@@ -83,6 +86,15 @@ const Settings: React.FC = () => {
     }
   };
 
+  // Show a loading message until stockInfo is loaded and values are set
+  if (!stockInfo || minPrice === null || maxPrice === null) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+  
   return (
     <View style={styles.container}>
       <Text style={styles.tickerName}>Selected Ticker: {ticker}</Text>
@@ -92,7 +104,7 @@ const Settings: React.FC = () => {
         minimumValue={0}
         maximumValue={currentPrice * 2 || 1000}
         step={0.01}
-        value={minPrice ?? sliderMiddle}
+        value={minPrice}
         onValueChange={setMinPrice}
         minimumTrackTintColor="#1EB1FC"
         maximumTrackTintColor="#8ED1FC"
@@ -104,7 +116,7 @@ const Settings: React.FC = () => {
         minimumValue={0}
         maximumValue={currentPrice * 2 || 1000}
         step={0.01}
-        value={maxPrice ?? sliderMiddle}
+        value={maxPrice}
         onValueChange={setMaxPrice}
         minimumTrackTintColor="#1EB1FC"
         maximumTrackTintColor="#8ED1FC"
