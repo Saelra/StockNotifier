@@ -1,10 +1,28 @@
 import { getCurrentSlope, getCurrentPrice, getSlopeAverage, getPriceAverage, getChangeAmount, getChangePercentage, getTransactionAmount, getVolumeAmount } from '@/services/stock-calculator';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Link } from 'expo-router';
+import { Link } from "expo-router";
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { setData, getData } from '../services/stock-storage';
 import BasicChart from '@/components/BasicChart';
+
+interface TimeRangeData {
+  lastFetchTime: string;
+  currentSlope: number | null;
+  currentPrice: number | null;
+  slopeAvg: number | null;
+  priceAvg: number | null;
+  chg: number | null;
+  chgPercent: number | null;
+  transactionAmount: number | null;
+  volume: number | null;
+}
+
+interface StockDetails {
+  timeRanges: {
+    [key: string]: TimeRangeData;
+  };
+}
 
 // Interface defining the props for the Detail component.
 interface DetailProps {
@@ -24,6 +42,9 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
   const [timeRange, setTimeRange] = useState('day');
   const timeRanges = ['day', 'week', 'month', 'year', 'max'];
 
+  const [stockPrices, setStockPrices] = useState<number[]>([]);
+  const [priceDates, setPriceDates] = useState<string[]>([]);
+
   // State variables for each info box, initialized to null
   const [currentSlope, setCurrentSlope] = useState<number | null>(null);
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
@@ -34,43 +55,55 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
   const [transactionAmount, setTransactionAmount] = useState<number | null>(null);
   const [volume, setVolume] = useState<number | null>(null);
 
-  // State variable to store the timestamp of the last data fetch
-  const [lastFetchTime, setLastFetchTime] = useState<Date | null>(null);
-
-  // Effect to update the info box values when the time range or stock symbol changes
   useEffect(() => {
 
-    // Collection of set and get functions
-    const fetchData = () => {
-      setCurrentSlope(getCurrentSlope(-1));
-      setCurrentPrice(getCurrentPrice(-1));
-      setSlopeAvg(getSlopeAverage(-1));
-      setPriceAvg(getPriceAverage(-1));
-      setChg(getChangeAmount(-1));
-      setChgPercent(getChangePercentage(-1));
-      setTransactionAmount(getTransactionAmount(-1));
-      setVolume(getVolumeAmount(-1));
-      // Update the last fetch time
-      setLastFetchTime(new Date());
-    };
+    const fetchDataAndStore = async () => {
 
-    // Fetch data if it doesn't exist yet or if it has been at least 15 minutes since the last fetch
-    if (!lastFetchTime || (new Date().getTime() - lastFetchTime.getTime()) >= 15 * 60 * 1000) {
-      fetchData();
-      setData("stockDetails", {
-        currentSlope: currentSlope,
-        currentPrice: currentPrice,
-        slopeAvg: slopeAvg,
-        priceAvg: priceAvg,
-        chg: chg,
-        chgPercent: chgPercent,
-        transactionAmount: transactionAmount,
-        volume: volume,
-      });
-    } else {
-      // TODO: use data from async storage if available
-      let stockDetails = getData("stockDetails");
-    }
+      const fetchData = () => {
+        setCurrentSlope(getCurrentSlope(-1));
+        setCurrentPrice(getCurrentPrice(-1));
+        setSlopeAvg(getSlopeAverage(-1));
+        setPriceAvg(getPriceAverage(-1));
+        setChg(getChangeAmount(-1));
+        setChgPercent(getChangePercentage(-1));
+        setTransactionAmount(getTransactionAmount(-1));
+        setVolume(getVolumeAmount(-1));
+      };
+
+      // Get the last time of the last fetch for the time range
+      const stockDetails = (await getData<StockDetails>("stockDetails")) ?? { timeRanges: {} };
+      const lastFetchTime = stockDetails.timeRanges[timeRange]?.lastFetchTime;
+
+      // Fetch data if it doesn't exist yet or if it has been at least 15 minutes since the last fetch
+      if (!lastFetchTime || (new Date().getTime() - new Date(lastFetchTime).getTime()) >= 15 * 60 * 1000) {
+
+        console.log("Fetching new data!");
+
+        // TODO: get from async storage
+        setStockPrices([1, 2, 3]);
+        setPriceDates(["yyyy-mm-dd", "yyyy-mm-dd", "yyyy-mm-dd"]);
+        fetchData();
+
+        await setData<StockDetails>("stockDetails", {
+          timeRanges: {
+            ...stockDetails.timeRanges, // Preserve existing time ranges
+            [timeRange]: {
+              lastFetchTime: new Date().toISOString(), // Store as ISO string
+              currentSlope: currentSlope,
+              currentPrice: currentPrice,
+              slopeAvg: slopeAvg,
+              priceAvg: priceAvg,
+              chg: chg,
+              chgPercent: chgPercent,
+              transactionAmount: transactionAmount,
+              volume: volume,
+            }
+          }
+        });
+      }
+    };
+    fetchDataAndStore();
+
   }, [timeRange, stockSymbol]);
 
   /**
@@ -138,7 +171,7 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
       </Link>
       {/* Stock price chart */}
       <View style={styles.graphContainer}>
-        <BasicChart chartData={[1, 3, 2, 4, 5]} chartWidth={chartWidth} chartHeight={chartHeight} />
+        <BasicChart stockPrices={stockPrices.length === 0 ? [0] : stockPrices}  priceDates={priceDates.length === 0 ? [""] : priceDates} chartWidth={chartWidth} chartHeight={chartHeight} />
       </View>
       {/* Time range radio buttons */}
       <View style={styles.timeRangeContainer}>
