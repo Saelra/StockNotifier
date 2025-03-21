@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, TextInput, FlatList, TouchableOpacity, StyleSheet, Text } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { searchStockTickers } from "../services/stock-api";
 import { useRouter } from "expo-router";  // Import Link from expo-router
 
@@ -13,7 +13,7 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
   const [filteredTickers, setFilteredTickers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const router = useRouter();  
+  const router = useRouter();
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -103,7 +103,7 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
       <TouchableOpacity onPress={goToSettings}>
         <Icon name="cog" size={24} color="#000" style={styles.settingsIcon} />
       </TouchableOpacity>
-    
+
 
     </View>
   );
