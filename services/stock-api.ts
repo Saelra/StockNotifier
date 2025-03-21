@@ -47,7 +47,7 @@ const validTimeSpans = ["minute", "hour", "day", "week", "month", "year"];
  * @param {number} [incrementMultiplier=1] - The amount of time per increment (default is 1).
  * @returns {Promise<number[]>} - A promise that resolves to an array of stock prices.
  */
-export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier: number = 1): Promise<[number[], string[]]> => {
+export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier: number = 1): Promise<[number[], string[], number[], number[]]> => {
 
 	const lowerCaseTimeSpan = timeSpan.toLowerCase().trim();
 
@@ -73,6 +73,8 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 	}
 	let stockAggregate: number[] = [];
 	let dateAggregate: string[] = [];
+	let transactionAggregate: number[] = [];
+	let volumeAggregate: number[] = [];
 
 	try {
 		const data = await rest.stocks.aggregates(
@@ -86,19 +88,31 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 		console.log(data);
 
 		if (data.results) {
-			// Create list of stock prices as numbers
+
+			// Retrieve stock prices
 			stockAggregate = data.results
 				.filter(result => result.c !== undefined)
 				.map(result => result.c as number);
-			// Create list of stock dates as strings
+
+			// Retrieve price dates
 			dateAggregate = data.results
 				.filter(result => result.t !== undefined)
 				.map(result => formatDateISO(new Date(result.t as number * 1000)));
+
+			// Retrieve stock transactions
+			transactionAggregate = data.results
+				.filter(result => result.n !== undefined)
+				.map(result => result.n as number);
+
+			// Retrieve stock volumes
+			volumeAggregate = data.results
+				.filter(result => result.v !== undefined)
+				.map(result => result.v as number);
 		}
 	} catch (e) {
 		console.error(e);
 	}
-	return [stockAggregate, dateAggregate]
+	return [stockAggregate, dateAggregate, transactionAggregate, volumeAggregate]
 };
 
 /**
