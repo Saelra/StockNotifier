@@ -55,6 +55,7 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
   const [transactionAmount, setTransactionAmount] = useState<number | null>(null);
   const [volume, setVolume] = useState<number | null>(null);
 
+  // TODO: read from storage to not be blank when re-opening
   useEffect(() => {
 
     const fetchDataAndStore = async () => {
