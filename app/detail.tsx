@@ -61,12 +61,12 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
     const fetchDataAndStore = async () => {
 
       const fetchData = () => {
-        setCurrentSlope(getCurrentSlope(-1));
+        setCurrentSlope(getCurrentSlope(-1, -1));
         setCurrentPrice(getCurrentPrice(-1));
-        setSlopeAvg(getSlopeAverage(-1));
-        setPriceAvg(getPriceAverage(-1));
-        setChg(getChangeAmount(-1));
-        setChgPercent(getChangePercentage(-1));
+        setSlopeAvg(getSlopeAverage([-1, -1]));
+        setPriceAvg(getPriceAverage([-1, -1]));
+        setChg(getChangeAmount(-1, -1));
+        setChgPercent(getChangePercentage(-1, -1));
         setTransactionAmount(getTransactionAmount(-1));
         setVolume(getVolumeAmount(-1));
       };
