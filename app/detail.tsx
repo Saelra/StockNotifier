@@ -46,8 +46,8 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
       setCurrentPrice(getCurrentPrice(-1));
       setSlopeAvg(getSlopeAverage(-1));
       setPriceAvg(getPriceAverage(-1));
-      setChg(getChangeAmount(-1));
-      setChgPercent(getChangePercentage(-1));
+      setChg(getChangeAmount(-1, -1));
+      setChgPercent(getChangePercentage(-1, -1));
       setTransactionAmount(getTransactionAmount(-1));
       setVolume(getVolumeAmount(-1));
       // Update the last fetch time

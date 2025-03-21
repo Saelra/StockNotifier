@@ -1,5 +1,6 @@
-import React from 'react';
-import { Alert } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Alert, AppState, AppStateStatus } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { stockInformation } from '../app/dashboard';
 
 export enum AlertType {
@@ -13,8 +14,8 @@ type alertObject = {
   alertType: AlertType;
 }
 
-const alertNotification = ({ stock, threshold, alertType }: alertObject): Promise<boolean> => {
-  return new Promise((resolve) => {
+const alertNotification = async ({ stock, threshold, alertType }: alertObject): Promise<boolean> => {
+  return new Promise(async (resolve) => {
     const { price } = stock.priceI;
     const { name, symbol } = stock.symbolI;
     const direction = alertType === AlertType.High ? 'above' : 'below';
@@ -24,17 +25,29 @@ const alertNotification = ({ stock, threshold, alertType }: alertObject): Promis
     const date = now.toLocaleDateString();
     const message = `${name} (${symbol}) stock price has gone ${direction} the ${threshold} threshold by $${difference} at ${time} on ${date}.`;
 
-    Alert.alert(
-      'Price Alert',
-      message,
-      [
-        { text: 'Discard', onPress: () => resolve(false), style: 'cancel' },
-        { text: 'Keep', onPress: () => resolve(true) },
-      ],
-      { cancelable: false }
-    );
+    const appState = AppState.currentState;
+
+    if (appState !== 'active') {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Price Alert',
+          body: message,
+        },
+        trigger: null,
+      });
+      resolve(true);  // Automatically resolve true for push notifications
+    } else {
+      Alert.alert(
+        'Price Alert',
+        message,
+        [
+          { text: 'Discard', onPress: () => resolve(false), style: 'cancel' },
+          { text: 'Keep', onPress: () => resolve(true) },
+        ],
+        { cancelable: false }
+      );
+    }
   });
 }
-
 
 export default alertNotification;
