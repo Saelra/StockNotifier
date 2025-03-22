@@ -106,10 +106,10 @@ const dashboard = () => {
     //pull from history the history :)
     // updateCurrentStockInfo();
 
-    // Set the stock symbol in async storage
-    setData<string>("stockPrices", sym.symbol);
+    // Set stock symbol in async storage
+    setData<string>("stockSymbol", sym.symbol);
 
-    // Fetch new stock data from the API
+    // Fetch new stock data from API
     backgroundFetchTask();
   }
 

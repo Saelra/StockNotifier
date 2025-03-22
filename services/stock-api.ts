@@ -23,10 +23,11 @@ const rest = restClient("8W1AIBVUlCB6VhhFFZdwtFFF_8Rfvn9B");
  * @returns {Promise<number>} - A promise that resolves to the stock price as a number. Returns -1 if the price could not be retrieved.
  */
 export const fetchStockDaily = async (stockSymbol: string): Promise<number> => {
+
 	try {
 		const data = await rest.stocks.dailyOpenClose(stockSymbol, formatDateISO(new Date()));
-		console.log(data);
-		return data.close ?? -1; // Use nullish coalescing operator to return -1 if close is undefined
+		return data.close ?? -1;
+
 	} catch (e) {
 		console.error(e);
 		return -1;
@@ -85,7 +86,7 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 			formatDateISO(new Date()),
 			{ sort: 'asc' }
 		);
-		console.log(data);
+		console.log("Data object returned by fetchStockAggregate(): " + data);
 
 		if (data.results) {
 
@@ -129,30 +130,36 @@ export const searchStockTickers = async (query: string): Promise<string[]> => {
 	if (!query.trim()) return stockSymbols;
 
 	try {
+			console.log("Fetching stock tickers for:", query);
 
-		console.log("Fetching stock tickers for:", query);
+			const response = await rest.reference.tickers({
+					search: query.toUpperCase(),
+					active: "true",
+					limit: 5,
+			});
 
-		const response = await rest.reference.tickers({
-			search: query.toUpperCase(),
-			active: "true",
-			limit: 5,
-		});
+			if (response && response.results) {
+					stockSymbols = response.results.map((ticker) => ticker.ticker);
+			}
+	} catch (error: unknown) {
 
-		if (response && response.results) {
-			stockSymbols = response.results.map((ticker) => ticker.ticker);
-		}
-	} catch (error: any) {
+			// Type guard to check if error has response and status properties
+			if (typeof error === 'object' && error !== null && 'response' in error) {
 
-		console.error("Error fetching stock tickers:", error.response ? error.response.data : error.message);
+					const err = error as { response: { status?: number, data?: string }, message?: string };
+					console.error("Error fetching stock tickers:", err.response.data || err.message);
 
-		// Handle rate limit errors (HTTP 429)
-		if (error.response?.status === 429) {
+					// Handle rate limit errors (HTTP 429)
+					if (err.response.status === 429) {
 
-			console.warn("Rate limit exceeded. Retrying in 5 seconds...");
-			await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
-			return searchStockTickers(query); // Retry the request
-		}
-		throw new Error(error.response?.data || error.message || "Error fetching stock data.");
+							console.warn("Rate limit exceeded. Retrying in 5 seconds...");
+							await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
+							return searchStockTickers(query); // Retry the request
+					}
+			} else {
+					console.error("Error fetching stock tickers:", (error as Error).message);
+			}
+			throw new Error((error as Error).message || "Error fetching stock data.");
 	}
-	return stockSymbols
+	return stockSymbols;
 };

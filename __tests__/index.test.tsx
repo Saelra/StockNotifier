@@ -9,6 +9,7 @@ jest.mock('expo-router', () => ({
 }));
 
 jest.mock('expo-background-fetch', () => ({
+
   registerTaskAsync: jest.fn(),
   BackgroundFetchResult: {
     NewData: 'NewData',

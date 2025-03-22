@@ -25,19 +25,14 @@ interface StockDetails {
   };
 }
 
-// Interface defining the props for the Detail component.
-interface DetailProps {
-  stockSymbol: string;
-}
 
 /**
  * Detail component that displays detailed stock information based on the provided stock symbol.
  * It includes a chart, time range selection, and various stock metrics.
  *
- * @param {DetailProps} props - The properties passed to the component.
  * @returns {JSX.Element} - The rendered component.
  */
-const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Element => {
+const Detail: React.FC = (): JSX.Element => {
 
   // State variable for the radio button time-range options and their increment amounts
   const [timeRange, setTimeRange] = useState('day');
@@ -118,7 +113,7 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
     };
     fetchDataAndStore();
 
-  }, [timeRange, stockSymbol]);
+  }, [timeRange]);
 
   /**
    * Helper function to format numbers with a percentage sign.
@@ -181,12 +176,12 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
     <View style={styles.container}>
       {/* Back button to navigate back to the dashboard */}
       <Link href="../dashboard" asChild>
-        <Pressable>
+        <Pressable testID="back-button">
           <Ionicons style={styles.backButton} name="arrow-back" size={30} color={"black"} />
         </Pressable>
       </Link>
       {/* Stock price chart */}
-      <View style={styles.graphContainer}>
+      <View style={styles.graphContainer} testID="graph-container">
         <BasicChart
           stockPrices={!stockPrices || stockPrices.length === 0 ? [0] : stockPrices}
           priceDates={!priceDates || priceDates.length === 0  ? [""] : priceDates}
@@ -203,12 +198,15 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
               styles.timeRangeButton,
               timeRange === range ? styles.selectedTimeRangeButton : null,
             ]}
-            onPress={() => setTimeRange(range)}>
+            onPress={() => setTimeRange(range)}
+            testID={`time-range-button-${range}`}
+          >
             <Text
               style={[
                 styles.timeRangeButtonText,
                 timeRange === range ? styles.selectedTimeRangeButtonText : null,
-              ]}>
+              ]}
+            >
               {range.charAt(0).toUpperCase() + range.slice(1)}
             </Text>
           </TouchableOpacity>

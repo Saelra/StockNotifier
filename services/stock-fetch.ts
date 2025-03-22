@@ -3,8 +3,6 @@ import { fetchStockAggregate } from './stock-api'; // Replace with your actual f
 
 export const backgroundFetchTask = async (): Promise<boolean> => {
 
-	console.log("background fetch called");
-
   try {
     // Get meta stock information
     let stockSymbol = await getData<string>("stockSymbol") ?? "AAPL";
