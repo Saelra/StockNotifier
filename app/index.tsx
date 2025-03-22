@@ -1,10 +1,49 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
 import { RelativePathString, useRouter } from 'expo-router';
+import * as BackgroundFetch from 'expo-background-fetch';
+import * as TaskManager from 'expo-task-manager';
+import { backgroundFetchTask } from '@/services/stock-fetch';
+
+const BACKGROUND_FETCH_TASK = 'background-fetch';
+
+// Run background fetch task
+TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+
+  try {
+    const newData = await backgroundFetchTask();
+
+    if (newData) {
+      return BackgroundFetch.BackgroundFetchResult.NewData;
+    } else {
+      return BackgroundFetch.BackgroundFetchResult.NoData;
+    }
+  } catch (error) {
+
+    console.error(error);
+    return BackgroundFetch.BackgroundFetchResult.Failed;
+  }
+});
+
 
 const graphImagePath = '../assets/images/graph-image.jpg';
 
 const Landing: React.FC = () => {
+
+  useEffect(() => {
+
+    async function registerBackgroundFetchAsync() {
+
+      return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
+        minimumInterval: 60 * 15, // 15 minutes
+        stopOnTerminate: false, // Android only
+        startOnBoot: true, // Android only
+      });
+    }
+    registerBackgroundFetchAsync();
+
+    return () => {};
+  }, []);
 
   const router = useRouter();
 
@@ -13,7 +52,7 @@ const Landing: React.FC = () => {
   };
 
   return (
-    <ImageBackground source={require(graphImagePath)} style={styles.image}>
+    <ImageBackground source={require(graphImagePath)} style={styles.image} testID="image-background">
       <View style={styles.overlay} />
       <View style={styles.container}>
         <Text style={styles.title}>Stock Notifier</Text>
