@@ -52,7 +52,7 @@ const Landing: React.FC = () => {
   };
 
   return (
-    <ImageBackground source={require(graphImagePath)} style={styles.image}>
+    <ImageBackground source={require(graphImagePath)} style={styles.image} testID="image-background">
       <View style={styles.overlay} />
       <View style={styles.container}>
         <Text style={styles.title}>Stock Notifier</Text>
