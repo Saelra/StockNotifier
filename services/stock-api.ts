@@ -23,10 +23,11 @@ const rest = restClient("8W1AIBVUlCB6VhhFFZdwtFFF_8Rfvn9B");
  * @returns {Promise<number>} - A promise that resolves to the stock price as a number. Returns -1 if the price could not be retrieved.
  */
 export const fetchStockDaily = async (stockSymbol: string): Promise<number> => {
+
 	try {
 		const data = await rest.stocks.dailyOpenClose(stockSymbol, formatDateISO(new Date()));
-		console.log(data);
-		return data.close ?? -1; // Use nullish coalescing operator to return -1 if close is undefined
+		return data.close ?? -1;
+
 	} catch (e) {
 		console.error(e);
 		return -1;
@@ -47,7 +48,7 @@ const validTimeSpans = ["minute", "hour", "day", "week", "month", "year"];
  * @param {number} [incrementMultiplier=1] - The amount of time per increment (default is 1).
  * @returns {Promise<number[]>} - A promise that resolves to an array of stock prices.
  */
-export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier: number = 1): Promise<[number[], string[]]> => {
+export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier: number = 1): Promise<[number[], string[], number[], number[]]> => {
 
 	const lowerCaseTimeSpan = timeSpan.toLowerCase().trim();
 
@@ -73,6 +74,8 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 	}
 	let stockAggregate: number[] = [];
 	let dateAggregate: string[] = [];
+	let transactionAggregate: number[] = [];
+	let volumeAggregate: number[] = [];
 
 	try {
 		const data = await rest.stocks.aggregates(
@@ -83,22 +86,34 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 			formatDateISO(new Date()),
 			{ sort: 'asc' }
 		);
-		console.log(data);
+		console.log("Data object returned by fetchStockAggregate(): " + data);
 
 		if (data.results) {
-			// Create list of stock prices as numbers
+
+			// Retrieve stock prices
 			stockAggregate = data.results
 				.filter(result => result.c !== undefined)
 				.map(result => result.c as number);
-			// Create list of stock dates as strings
+
+			// Retrieve price dates
 			dateAggregate = data.results
 				.filter(result => result.t !== undefined)
 				.map(result => formatDateISO(new Date(result.t as number * 1000)));
+
+			// Retrieve stock transactions
+			transactionAggregate = data.results
+				.filter(result => result.n !== undefined)
+				.map(result => result.n as number);
+
+			// Retrieve stock volumes
+			volumeAggregate = data.results
+				.filter(result => result.v !== undefined)
+				.map(result => result.v as number);
 		}
 	} catch (e) {
 		console.error(e);
 	}
-	return [stockAggregate, dateAggregate]
+	return [stockAggregate, dateAggregate, transactionAggregate, volumeAggregate]
 };
 
 /**
@@ -115,30 +130,36 @@ export const searchStockTickers = async (query: string): Promise<string[]> => {
 	if (!query.trim()) return stockSymbols;
 
 	try {
+			console.log("Fetching stock tickers for:", query);
 
-		console.log("Fetching stock tickers for:", query);
+			const response = await rest.reference.tickers({
+					search: query.toUpperCase(),
+					active: "true",
+					limit: 5,
+			});
 
-		const response = await rest.reference.tickers({
-			search: query.toUpperCase(),
-			active: "true",
-			limit: 5,
-		});
+			if (response && response.results) {
+					stockSymbols = response.results.map((ticker) => ticker.ticker);
+			}
+	} catch (error: unknown) {
 
-		if (response && response.results) {
-			stockSymbols = response.results.map((ticker) => ticker.ticker);
-		}
-	} catch (error: any) {
+			// Type guard to check if error has response and status properties
+			if (typeof error === 'object' && error !== null && 'response' in error) {
 
-		console.error("Error fetching stock tickers:", error.response ? error.response.data : error.message);
+					const err = error as { response: { status?: number, data?: string }, message?: string };
+					console.error("Error fetching stock tickers:", err.response.data || err.message);
 
-		// Handle rate limit errors (HTTP 429)
-		if (error.response?.status === 429) {
+					// Handle rate limit errors (HTTP 429)
+					if (err.response.status === 429) {
 
-			console.warn("Rate limit exceeded. Retrying in 5 seconds...");
-			await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
-			return searchStockTickers(query); // Retry the request
-		}
-		throw new Error(error.response?.data || error.message || "Error fetching stock data.");
+							console.warn("Rate limit exceeded. Retrying in 5 seconds...");
+							await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
+							return searchStockTickers(query); // Retry the request
+					}
+			} else {
+					console.error("Error fetching stock tickers:", (error as Error).message);
+			}
+			throw new Error((error as Error).message || "Error fetching stock data.");
 	}
-	return stockSymbols
+	return stockSymbols;
 };

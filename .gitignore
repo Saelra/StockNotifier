@@ -36,3 +36,12 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# PhpStorm
+.idea
+
+# VSCode
+.vscode
+
+# Jest Coverage
+coverage

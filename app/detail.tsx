@@ -1,10 +1,11 @@
-import { getCurrentSlope, getCurrentPrice, getSlopeAverage, getPriceAverage, getChangeAmount, getChangePercentage, getTransactionAmount, getVolumeAmount } from '@/services/stock-calculator';
+import { getCurrentSlope, getSlopeAverage, getPriceAverage, getChangeAmount, getChangePercentage } from '@/services/stock-calculator';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link } from "expo-router";
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { setData, getData } from '../services/stock-storage';
 import BasicChart from '@/components/BasicChart';
+import { backgroundFetchTask } from '@/services/stock-fetch';
 
 interface TimeRangeData {
   lastFetchTime: string;
@@ -14,8 +15,8 @@ interface TimeRangeData {
   priceAvg: number | null;
   chg: number | null;
   chgPercent: number | null;
-  transactionAmount: number | null;
-  volume: number | null;
+  transactions: number[] | null;
+  volumes: number[] | null;
 }
 
 interface StockDetails {
@@ -24,26 +25,22 @@ interface StockDetails {
   };
 }
 
-// Interface defining the props for the Detail component.
-interface DetailProps {
-  stockSymbol: string;
-}
 
 /**
  * Detail component that displays detailed stock information based on the provided stock symbol.
  * It includes a chart, time range selection, and various stock metrics.
  *
- * @param {DetailProps} props - The properties passed to the component.
  * @returns {JSX.Element} - The rendered component.
  */
-const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Element => {
+const Detail: React.FC = (): JSX.Element => {
 
-  // State variable for the radio button time-range options.
+  // State variable for the radio button time-range options and their increment amounts
   const [timeRange, setTimeRange] = useState('day');
   const timeRanges = ['day', 'week', 'month', 'year', 'max'];
+  const incrementAmounts = [7, 4, 12, 1, 12];
 
-  const [stockPrices, setStockPrices] = useState<number[]>([]);
-  const [priceDates, setPriceDates] = useState<string[]>([]);
+  const [stockPrices, setStockPrices] = useState<number[] | null>(null);
+  const [priceDates, setPriceDates] = useState<string[] | null>(null);
 
   // State variables for each info box, initialized to null
   const [currentSlope, setCurrentSlope] = useState<number | null>(null);
@@ -52,38 +49,49 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
   const [priceAvg, setPriceAvg] = useState<number | null>(null);
   const [chg, setChg] = useState<number | null>(null);
   const [chgPercent, setChgPercent] = useState<number | null>(null);
-  const [transactionAmount, setTransactionAmount] = useState<number | null>(null);
-  const [volume, setVolume] = useState<number | null>(null);
+  const [transactions, setTransactions] = useState<number[] | null>(null);
+  const [volumes, setVolumes] = useState<number[] | null>(null);
 
-  // TODO: read from storage to not be blank when re-opening
   useEffect(() => {
 
     const fetchDataAndStore = async () => {
 
-      const fetchData = () => {
-        setCurrentSlope(getCurrentSlope(-1, -1));
-        setCurrentPrice(getCurrentPrice(-1));
-        setSlopeAvg(getSlopeAverage([-1, -1]));
-        setPriceAvg(getPriceAverage([-1, -1]));
-        setChg(getChangeAmount(-1, -1));
-        setChgPercent(getChangePercentage(-1, -1));
-        setTransactionAmount(getTransactionAmount(-1));
-        setVolume(getVolumeAmount(-1));
-      };
+      // Get stock prices and dates
+      let fetchedStockPrices = await getData<number[]>("stockPrices") ?? [];
+      let fetchedPriceDates = await getData<string[]>("priceDates") ?? [];
 
-      // Get the last time of the last fetch for the time range
-      const stockDetails = (await getData<StockDetails>("stockDetails")) ?? { timeRanges: {} };
-      const lastFetchTime = stockDetails.timeRanges[timeRange]?.lastFetchTime;
+      // Set stock prices and dates
+      setStockPrices(fetchedStockPrices);
+      setPriceDates(fetchedPriceDates);
+
+      // If stock price data is present, calculate stock details
+      if (fetchedStockPrices && fetchedStockPrices.length > 1) {
+
+        // Set new stock details
+        setCurrentSlope(getCurrentSlope(fetchedStockPrices[fetchedStockPrices.length-1], fetchedStockPrices[fetchedStockPrices.length-2]));
+        setCurrentPrice(fetchedStockPrices[fetchedStockPrices.length-1] ?? null);
+        setSlopeAvg(getSlopeAverage(fetchedStockPrices));
+        setPriceAvg(getPriceAverage(fetchedStockPrices));
+        setChg(getChangeAmount(fetchedStockPrices[fetchedStockPrices.length-1], fetchedStockPrices[fetchedStockPrices.length-2]));
+        setChgPercent(getChangePercentage(fetchedStockPrices[fetchedStockPrices.length-1], fetchedStockPrices[fetchedStockPrices.length-2]));
+        setTransactions(await getData<number[]>("stockTransactions") ?? null);
+        setVolumes(await getData<number[]>("stockVolumes") ?? null);
+      }
+
+      // Get time of last fetch for selected time range
+      let stockDetails = (await getData<StockDetails>("stockDetails")) ?? { timeRanges: {} };
+      let lastFetchTime = stockDetails.timeRanges[timeRange]?.lastFetchTime;
 
       // Fetch data if it doesn't exist yet or if it has been at least 15 minutes since the last fetch
       if (!lastFetchTime || (new Date().getTime() - new Date(lastFetchTime).getTime()) >= 15 * 60 * 1000) {
 
-        console.log("Fetching new data!");
+        setData<string>("timeRange", timeRange);
 
-        // TODO: get from async storage
-        setStockPrices([1, 2, 3]);
-        setPriceDates(["yyyy-mm-dd", "yyyy-mm-dd", "yyyy-mm-dd"]);
-        fetchData();
+        // Use a specific increment amount for the time range
+        setData<number>("incrementAmount", incrementAmounts[timeRanges.indexOf(timeRange)]);
+        setData<number>("incrementMultiplier", 1);
+
+        backgroundFetchTask();
 
         await setData<StockDetails>("stockDetails", {
           timeRanges: {
@@ -96,8 +104,8 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
               priceAvg: priceAvg,
               chg: chg,
               chgPercent: chgPercent,
-              transactionAmount: transactionAmount,
-              volume: volume,
+              transactions: transactions,
+              volumes: volumes,
             }
           }
         });
@@ -105,7 +113,7 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
     };
     fetchDataAndStore();
 
-  }, [timeRange, stockSymbol]);
+  }, [timeRange]);
 
   /**
    * Helper function to format numbers with a percentage sign.
@@ -132,27 +140,29 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
   };
 
   /**
-   * Helper function to format change amounts with two decimal places.
+   * Helper function to format value amounts with two decimal places.
    * If the value is null, it returns a dash ('-').
    *
-   * @param {number | null} value - The change amount to format.
+   * @param {number | null} value - The value amount to format.
    * @returns {string} - The formatted string.
    */
-  const formatChange = (value: number | null): string => {
+  const current = (value: number | null): string => {
     if (value === null) return '-';
     return value.toFixed(2);
   };
 
   /**
-   * Helper function to format volume and transaction amounts with commas.
-   * If the value is null, it returns a dash ('-').
+   * Helper function to sum and format volumes and transactions with commas.
+   * If values is null, it returns a dash ('-').
    *
-   * @param {number | null} value - The volume or transaction amount to format.
+   * @param {number[] | null} values - The volumes or transactions to format.
    * @returns {string} - The formatted string with commas.
    */
-  const formatVolume = (value: number | null): string => {
-    if (value === null) return '-';
-    return value.toLocaleString();
+  const formatSum = (values: number[] | null): string => {
+    if (values === null || values.length === 0) return '-';
+    return values
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+      .toLocaleString();
   };
 
   // Get screen dimensions
@@ -166,13 +176,18 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
     <View style={styles.container}>
       {/* Back button to navigate back to the dashboard */}
       <Link href="../dashboard" asChild>
-        <Pressable>
+        <Pressable testID="back-button">
           <Ionicons style={styles.backButton} name="arrow-back" size={30} color={"black"} />
         </Pressable>
       </Link>
       {/* Stock price chart */}
-      <View style={styles.graphContainer}>
-        <BasicChart stockPrices={stockPrices.length === 0 ? [0] : stockPrices}  priceDates={priceDates.length === 0 ? [""] : priceDates} chartWidth={chartWidth} chartHeight={chartHeight} />
+      <View style={styles.graphContainer} testID="graph-container">
+        <BasicChart
+          stockPrices={!stockPrices || stockPrices.length === 0 ? [0] : stockPrices}
+          priceDates={!priceDates || priceDates.length === 0  ? [""] : priceDates}
+          chartWidth={chartWidth}
+          chartHeight={chartHeight}
+        />
       </View>
       {/* Time range radio buttons */}
       <View style={styles.timeRangeContainer}>
@@ -183,12 +198,15 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
               styles.timeRangeButton,
               timeRange === range ? styles.selectedTimeRangeButton : null,
             ]}
-            onPress={() => setTimeRange(range)}>
+            onPress={() => setTimeRange(range)}
+            testID={`time-range-button-${range}`}
+          >
             <Text
               style={[
                 styles.timeRangeButtonText,
                 timeRange === range ? styles.selectedTimeRangeButtonText : null,
-              ]}>
+              ]}
+            >
               {range.charAt(0).toUpperCase() + range.slice(1)}
             </Text>
           </TouchableOpacity>
@@ -206,15 +224,15 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
         </View>
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>Current Slope</Text>
-          <Text style={styles.infoValue}>{formatPercentage(currentSlope)}</Text>
+          <Text style={styles.infoValue}>{current(currentSlope)}</Text>
         </View>
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>Average Slope</Text>
-          <Text style={styles.infoValue}>{formatPercentage(slopeAvg)}</Text>
+          <Text style={styles.infoValue}>{current(slopeAvg)}</Text>
         </View>
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>Change Amount</Text>
-          <Text style={styles.infoValue}>{formatChange(chg)}</Text>
+          <Text style={styles.infoValue}>{formatPrice(chg)}</Text>
         </View>
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>Change Percentage</Text>
@@ -222,11 +240,11 @@ const Detail: React.FC<DetailProps> = ({ stockSymbol }: DetailProps): JSX.Elemen
         </View>
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>Transaction Amount</Text>
-          <Text style={styles.infoValue}>{formatVolume(transactionAmount)}</Text>
+          <Text style={styles.infoValue}>{formatSum(transactions)}</Text>
         </View>
         <View style={styles.infoBox}>
-          <Text style={styles.infoTitle}>Trading Volume</Text>
-          <Text style={styles.infoValue}>{formatVolume(volume)}</Text>
+          <Text style={styles.infoTitle}>Trading Volumes</Text>
+          <Text style={styles.infoValue}>{formatSum(volumes)}</Text>
         </View>
       </View>
     </View>

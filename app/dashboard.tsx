@@ -10,6 +10,7 @@ import {useState, useEffect} from "react"
 import { setData, getData } from '../services/stock-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import alertNotification, { AlertType } from '../components/priceNotificationElement';
+import { backgroundFetchTask } from "@/services/stock-fetch";
 
 
 type historyObject = {
@@ -105,6 +106,11 @@ const dashboard = () => {
     //pull from history the history :)
     // updateCurrentStockInfo();
 
+    // Set stock symbol in async storage
+    setData<string>("stockSymbol", sym.symbol);
+
+    // Fetch new stock data from API
+    backgroundFetchTask();
   }
 
   useEffect(() => {
@@ -211,7 +217,7 @@ const dashboard = () => {
         threshold: maxValue,
         alertType: AlertType.High,
       });
-  
+
       if (userWantsToKeep) {
         addNewHistoryObject(newPriceInfo.price, maxValue, newPriceInfo.priceDelta);
       }
@@ -221,7 +227,7 @@ const dashboard = () => {
         threshold: minValue,
         alertType: AlertType.Low,
       });
-  
+
       if (userWantsToKeep) {
         addNewHistoryObject(newPriceInfo.price, minValue, newPriceInfo.priceDelta);
       }
