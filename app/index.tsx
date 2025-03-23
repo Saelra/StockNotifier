@@ -25,7 +25,6 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
   }
 });
 
-
 const graphImagePath = '../assets/images/graph-image.jpg';
 
 const Landing: React.FC = () => {

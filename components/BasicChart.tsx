@@ -52,7 +52,6 @@ const ChartObject = ({ stockPrices, priceDates, chartWidth, chartHeight }: chart
         width={chartWidth ?? Dimensions.get("window").width * 0.9}
         height={chartHeight ?? Dimensions.get("window").height * 0.3}
         yAxisLabel="$"
-        yAxisSuffix="k"
         chartConfig={{
           backgroundGradientFrom: "#222",
           backgroundGradientTo: "#222",
