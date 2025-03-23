@@ -192,7 +192,7 @@ const Dashboard : React.FC = () => {
         setMaxValue(value.max);
         // getHistoryData(value.symbolI.symbol)
         // .then(hValue => {setHistoryList(hValue)})
-
+      
       } else{
         updateCurrentStockInfo();
       }

@@ -7,7 +7,7 @@ type symbolProps = {
     name?: string
 };
 
-const symbolHeader = ({symbol, name} : symbolProps) => {
+const SymbolHeader = ({symbol, name} : symbolProps) => {
     return (
         <View>
            <Text
@@ -21,7 +21,7 @@ const symbolHeader = ({symbol, name} : symbolProps) => {
 
 }
 
-export default symbolHeader;
+export default SymbolHeader;
 
 const styles = StyleSheet.create({
     container: {
