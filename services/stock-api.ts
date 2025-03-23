@@ -52,8 +52,14 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 
 	const lowerCaseTimeSpan = timeSpan.toLowerCase().trim();
 
+	let stockAggregate: number[] = [];
+	let dateAggregate: string[] = [];
+	let transactionAggregate: number[] = [];
+	let volumeAggregate: number[] = [];
+
 	if (!validTimeSpans.includes(lowerCaseTimeSpan)) {
 		console.error("Not a valid time span. Please use 'minute', 'hour', 'day', 'week', 'month', or 'year'");
+		return [stockAggregate, dateAggregate, transactionAggregate, volumeAggregate]
 	}
 	const startingDate = new Date();
 
@@ -72,10 +78,6 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 			startingDate.setFullYear(startingDate.getFullYear() - incrementAmount);
 			break;
 	}
-	let stockAggregate: number[] = [];
-	let dateAggregate: string[] = [];
-	let transactionAggregate: number[] = [];
-	let volumeAggregate: number[] = [];
 
 	try {
 		const data = await rest.stocks.aggregates(

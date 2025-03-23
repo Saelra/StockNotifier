@@ -1,4 +1,3 @@
-import React, { useEffect, useRef } from 'react';
 import { Alert, AppState, AppStateStatus } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { stockInformation } from '../app/dashboard';
@@ -15,7 +14,9 @@ type alertObject = {
 }
 
 const alertNotification = async ({ stock, threshold, alertType }: alertObject): Promise<boolean> => {
+
   return new Promise(async (resolve) => {
+
     const { price } = stock.priceI;
     const { name, symbol } = stock.symbolI;
     const direction = alertType === AlertType.High ? 'above' : 'below';
@@ -27,6 +28,8 @@ const alertNotification = async ({ stock, threshold, alertType }: alertObject): 
 
     const appState = AppState.currentState;
 
+    // TODO: save message to history in async storage
+
     if (appState !== 'active') {
       await Notifications.scheduleNotificationAsync({
         content: {
@@ -36,6 +39,7 @@ const alertNotification = async ({ stock, threshold, alertType }: alertObject): 
         trigger: null,
       });
       resolve(true);  // Automatically resolve true for push notifications
+
     } else {
       Alert.alert(
         'Price Alert',
