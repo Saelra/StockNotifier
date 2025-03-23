@@ -1,18 +1,23 @@
 import React from "react";
 import {View, Text, StyleSheet, Pressable} from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Link } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
-const About = () => {
+
+
+const About: React.FC = () => {
+    const router = useRouter();
+
+   
+
     return (
         <View>
-            <Link href="../dashboard" asChild>
-                <Pressable>
-                    <Ionicons style={styles.backButton} name="arrow-back" size={30} color={"black"} />
-                </Pressable>
-            </Link>
+            <Pressable onPress={() => router.push("/dashboard")} testID="backButton">
+                <Ionicons style={styles.backButton} name="arrow-back" size={30} color={"black"}/>
+            </Pressable>
             <Text style={styles.headline}>About Us</Text>
-            <Text style={styles.body}> This dream team was created to excel in college and deepen our understanding of computing systems. In this class we will strive to learn the finer details of software Architecture and the exciting world of open-source projects.
+            <Text style={styles.body} testID="aboutInfo">
+            This dream team was created to excel in college and deepen our understanding of computing systems. With this project we will strive to learn the finer details of software Architecture and the exciting world of mobile projects. 
             </Text>
         </View>
     );
