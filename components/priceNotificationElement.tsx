@@ -1,6 +1,7 @@
 import { Alert, AppState, AppStateStatus } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { stockInformation } from '../app/dashboard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export enum AlertType {
     High = 'high',
@@ -28,7 +29,6 @@ const alertNotification = async ({ stock, threshold, alertType }: alertObject): 
 
     const appState = AppState.currentState;
 
-    // TODO: save message to history in async storage
 
     if (appState !== 'active') {
       await Notifications.scheduleNotificationAsync({
@@ -39,6 +39,7 @@ const alertNotification = async ({ stock, threshold, alertType }: alertObject): 
         trigger: null,
       });
       resolve(true);  // Automatically resolve true for push notifications
+      saveNotificationToHistory(message);
 
     } else {
       Alert.alert(
@@ -53,5 +54,37 @@ const alertNotification = async ({ stock, threshold, alertType }: alertObject): 
     }
   });
 }
+
+// Function to save the message to history in AsyncStorage
+const saveNotificationToHistory = async (message: string) => {
+  const historyData = await getHistoryData('notificationHistory');
+  
+  const newHistoryObject = {
+    dateOccurrence: new Date(),
+    message,
+  };
+
+  const updatedHistory = [...historyData, newHistoryObject];
+
+  // Save updated history to AsyncStorage
+  try {
+    const jsonData = JSON.stringify(updatedHistory);
+    await AsyncStorage.setItem('notificationHistory', jsonData);
+    console.log('Notification history saved successfully.');
+  } catch (error) {
+    console.error('Error saving notification history:', error);
+  }
+};
+
+// Function to retrieve history from AsyncStorage
+export const getHistoryData = async (key: string): Promise<any[]> => {
+  try {
+    const jsonData = await AsyncStorage.getItem(key);
+    return jsonData != null ? JSON.parse(jsonData) : [];
+  } catch (error) {
+    console.error(`Error getting data from ${key}:`, error);
+    return [];
+  }
+};
 
 export default alertNotification;

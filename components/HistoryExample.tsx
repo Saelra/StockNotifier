@@ -1,7 +1,8 @@
 import React from "react";
-import {View, Text, StyleSheet, FlatList, SafeAreaView} from 'react-native';
+import {View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity} from 'react-native';
 import HistoryItem from "@/components/HistoryItem"
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
 
 type historyObject = {
     dateOccurrence : Date,
@@ -13,6 +14,9 @@ interface HistoryProps {
     historyList : historyObject[]
 };
 
+const goToNotificationHistory = () => {
+    router.push('/history');  // Navigate to the settings page
+  };
 
 const History : React.FC<HistoryProps> = ({historyList}) => {
 
@@ -20,8 +24,11 @@ const History : React.FC<HistoryProps> = ({historyList}) => {
     if(historyList[0] !== null){return (
         <>
             <SafeAreaView style={styles.historyHeader}>
-                <Text style={styles.header}> Price Notification History </Text>
-                <Ionicons name="arrow-forward-outline" size={20} color="black"/>
+                <TouchableOpacity onPress={goToNotificationHistory}>
+                    <Text style={styles.header}> Price Notification History 
+                        <Ionicons name="arrow-forward-outline" size={20} color="black"/>
+                    </Text>
+                </TouchableOpacity>
             </SafeAreaView>
             <FlatList
                 data={historyList}
