@@ -27,7 +27,7 @@ export const getCurrentSlope = (previousNumber: number, currentNumber: number): 
     if (!previousNumber || !currentNumber) {
         return null;
     }
-    return currentNumber - previousNumber;
+    return previousNumber - currentNumber;
 };
 
 /**
