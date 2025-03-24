@@ -38,7 +38,7 @@ function getKeyElements<T>(arr: T[]): T[] {
 
 const ChartObject = ({ stockPrices, priceDates, chartWidth, chartHeight }: chartProp) => {
   return (
-    <View>
+    <View testID="chart">
       <LineChart
         data={{
           // Get the key price dates (up to 5 of them to avoid label overlap)

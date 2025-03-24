@@ -12,14 +12,14 @@ jest.mock('expo-router', () => ({
 
 jest.mock("expo-font");
 
-jest.mock('expo-background-fetch', () => ({
-  registerTaskAsync: jest.fn(),
-  BackgroundFetchResult: {
-    NewData: 'NewData',
-    NoData: 'NoData',
-    Failed: 'Failed',
-  },
-}));
+// jest.mock('expo-background-fetch', () => ({
+//   registerTaskAsync: jest.fn(),
+//   BackgroundFetchResult: {
+//     NewData: 'NewData',
+//     NoData: 'NoData',
+//     Failed: 'Failed',
+//   },
+// }));
 
 jest.mock('expo-task-manager', () => ({
   defineTask: jest.fn(),

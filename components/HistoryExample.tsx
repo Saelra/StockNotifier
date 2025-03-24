@@ -21,7 +21,7 @@ const goToNotificationHistory = () => {
 const History : React.FC<HistoryProps> = ({historyList}) => {
 
 
-    if(historyList[0] !== null){return (
+    if(historyList.length > 0){return (
         <>
             <SafeAreaView style={styles.historyHeader}>
                 <TouchableOpacity onPress={goToNotificationHistory}>
