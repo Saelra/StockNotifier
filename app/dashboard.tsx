@@ -14,7 +14,7 @@ import { backgroundFetchTask } from "@/services/stock-fetch";
 
 /**
  * object to hold a single history event
- * Is positive used to show if the price went up or down. 
+ * Is positive used to show if the price went up or down.
  */
 type historyObject = {
   dateOccurrence : Date,
@@ -23,7 +23,7 @@ type historyObject = {
 }
 
 /**
- * used in debugging 
+ * used in debugging
  */
 const createFakeHistory : historyObject[] = [
       {
@@ -81,7 +81,7 @@ export interface stockInformation {
  */
 const Dashboard : React.FC = () => {
 
-  
+
   const [dataState, setDataState] = useState([0]);
   const [priceInfo, setPriceInfo] = useState<priceInformation>({price: 0, priceDelta: 0, percentIncrease: 0})
   const [symbolInfo, setSymbolInfo] = useState<symbolInformation>({name : "-----", symbol: "---" })
@@ -92,12 +92,12 @@ const Dashboard : React.FC = () => {
 
   /**
    * objec that is used in the Ticker object
-   * @param data 
+   * @param data
    */
   const handleTickerDataSelect = (data: string) => {
     setTicker(data);
     const newSymbolInformation: symbolInformation = {
-      name: 'need API return name',
+      name: 'Stock Symbol: ',
       symbol: data
     }
     changeSymbol(newSymbolInformation);
@@ -106,7 +106,7 @@ const Dashboard : React.FC = () => {
   /**
    * This function is used to send data to storage
    * @param key is a sting used to key the stored object
-   * @param data is the object being stored 
+   * @param data is the object being stored
    */
   const setHistoryData = async (key : string, data: historyObject[]  ) => {
     try {
@@ -134,7 +134,7 @@ const Dashboard : React.FC = () => {
   }
 
   /**
-   * Function to set the symbol inforamtion, it also clear the rest of the dashboad 
+   * Function to set the symbol inforamtion, it also clear the rest of the dashboad
    * since with a new symbol, the information will change.
    * @param sym is a symbolInformaiton Object that holds the new symbol
    */
@@ -192,7 +192,7 @@ const Dashboard : React.FC = () => {
         setMaxValue(value.max);
         // getHistoryData(value.symbolI.symbol)
         // .then(hValue => {setHistoryList(hValue)})
-      
+
       } else{
         updateCurrentStockInfo();
       }
@@ -201,7 +201,7 @@ const Dashboard : React.FC = () => {
   )}, []);
 
   /**
-   * function to update stock it will setcurrent stock info 
+   * function to update stock it will setcurrent stock info
    */
   async function updateCurrentStockInfo(): Promise<void> {
     // Retrieve min and max values from AsyncStorage
@@ -249,7 +249,7 @@ const Dashboard : React.FC = () => {
   }
 
   /**
-   * this funciton will add the price to history, graph and update the saved data in stroage, 
+   * this funciton will add the price to history, graph and update the saved data in stroage,
    * it will also update the displayed price.
    * @param newStockPrice the new stock price number
    */
@@ -347,9 +347,9 @@ const Dashboard : React.FC = () => {
           </Link>
         </TouchableOpacity>
         <History historyList = {historyList}/>
-        <Button title="Add MOck Data" onPress={addMockData} />
-        <Button title="clear data" onPress={clearData} />
-        <Link href="../about">to About</Link>
+        <Button title="Add Mock Data" onPress={addMockData} />
+        <Button title="Clear data" onPress={clearData} />
+        <Link href="../about">About Us</Link>
       </View>
     );
   };

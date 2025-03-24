@@ -36,9 +36,10 @@ interface StockDetails {
 const Detail: React.FC = (): JSX.Element => {
 
   // State variable for the radio button time-range options and their increment amounts
-  const [timeRange, setTimeRange] = useState('day');
-  const timeRanges = ['day', 'week', 'month', 'year'];
-  const incrementAmounts = [7, 4, 12, 1, 12];
+  const [timeRange, setTimeRange] = useState('week');
+  const timeRanges = ['week', 'month', 'quarter', 'year'];
+  const incrementTimes = ['day', 'week', 'month', 'month'];
+  const incrementAmounts = [7, 4, 6, 12];
 
   const [stockPrices, setStockPrices] = useState<number[] | null>(null);
   const [priceDates, setPriceDates] = useState<Date[] | null>(null);
@@ -86,10 +87,10 @@ const Detail: React.FC = (): JSX.Element => {
       // Fetch data if it doesn't exist yet or if it has been at least a minute since the last fetch
       if (!lastFetchTime || (new Date().getTime() - new Date(lastFetchTime).getTime()) >= 60 * 1000) {
 
-        setData<string>("timeRange", timeRange);
+        let index: number = timeRanges.indexOf(timeRange) ?? 0;
 
-        // Use a specific increment amount for the time range
-        setData<number>("incrementAmount", incrementAmounts[timeRanges.indexOf(timeRange)]);
+        setData<string>("timeRange", incrementTimes[index] ?? "day");
+        setData<number>("incrementAmount", incrementAmounts[index] ?? 0);
         setData<number>("incrementMultiplier", 1);
 
         backgroundFetchTask();
