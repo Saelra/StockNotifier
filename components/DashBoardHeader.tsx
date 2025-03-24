@@ -2,12 +2,17 @@ import React, { useState, useEffect } from "react";
 import { View, TextInput, FlatList, TouchableOpacity, StyleSheet, Text } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { searchStockTickers } from "../services/stock-api";
-import { useRouter } from "expo-router";  // Import Link from expo-router
+import { useRouter } from "expo-router"; 
 
 interface dbHeaderProps {
   onTickerDataSelect: (data: string) => void;
 }
 
+/**
+ * Serch bar component for searching stock tickers and navigating to the settings page.
+ * @param {dbHeaderProps} props - The props for dbHeader component.
+ * @returns {JSX.Element} The rendered component.
+ */
 const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredTickers, setFilteredTickers] = useState<string[]>([]);
@@ -15,6 +20,9 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
+  /**
+   * hook to handle search query updates and filter stock tickers.
+   */
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredTickers([]);
@@ -40,19 +48,18 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
       } finally {
         setLoading(false);
       }
-    }, 500);
+    }, 500); // Delay to avoid excessive requests
 
     return () => clearTimeout(delaySearch);
   }, [searchQuery]);
 
   const handleTickerSelect = (ticker: string) => {
-    setSearchQuery(""); // Clear the search query after selecting the ticker
+    setSearchQuery("");
     onTickerDataSelect(ticker);
-    setFilteredTickers([]); // Clear the suggestions after selection
+    setFilteredTickers([]);
   };
-
   const goToSettings = () => {
-    router.push('/settings');  // Navigate to the settings page
+    router.push('/settings');
   };
 
   return (
