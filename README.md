@@ -32,7 +32,7 @@ To get started with StockNotifier, follow these steps:
    ```bash
    npx expo start
 
-## Contrbution
+## Contribution
 
 Aaron Jeromsky: deatil graph, fetch api data, landing page
 
