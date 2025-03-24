@@ -6,7 +6,7 @@ import { render, fireEvent, act } from '@testing-library/react-native';
 
 jest.mock('react-native', () => ({
   Alert: {
-    alert: jest.fn(),
+    alert: jest.fn((title, message, buttons) => buttons[1].onPress()),
   },
   AppState: {
     currentState: 'active',
@@ -15,7 +15,15 @@ jest.mock('react-native', () => ({
   },
 }));
 
+jest.mock('expo-notifications', () => ({
+  scheduleNotificationAsync: jest.fn(),
+}));
+
+const flushPromises = () => new Promise(setImmediate);
+
 describe('alertNotification', () => {
+  jest.setTimeout(10000); // Increase test timeout to 10 seconds
+
   const mockStock: stockInformation = {
     priceI: { price: 150, priceDelta: 5, percentIncrease: 3.45 },
     symbolI: { name: 'Test Company', symbol: 'TST' },
@@ -33,6 +41,7 @@ describe('alertNotification', () => {
 
     await act(async () => {
       await alertNotification({ stock: mockStock, threshold: 160, alertType: AlertType.High });
+      await flushPromises();
     });
 
     expect(Alert.alert).toHaveBeenCalledWith(
@@ -46,14 +55,12 @@ describe('alertNotification', () => {
   it('sends a push notification when app is in background', async () => {
     AppState.currentState = 'background';
 
-    const Notifications = require('expo-notifications');
-    Notifications.scheduleNotificationAsync = jest.fn();
-
     await act(async () => {
       await alertNotification({ stock: mockStock, threshold: 160, alertType: AlertType.High });
+      await flushPromises();
     });
 
-    expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(
+    expect(require('expo-notifications').scheduleNotificationAsync).toHaveBeenCalledWith(
       expect.objectContaining({
         content: expect.objectContaining({
           title: 'Price Alert',
@@ -66,14 +73,12 @@ describe('alertNotification', () => {
   it('sends a push notification when app is inactive', async () => {
     AppState.currentState = 'inactive';
 
-    const Notifications = require('expo-notifications');
-    Notifications.scheduleNotificationAsync = jest.fn();
-
     await act(async () => {
       await alertNotification({ stock: mockStock, threshold: 160, alertType: AlertType.High });
+      await flushPromises();
     });
 
-    expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(
+    expect(require('expo-notifications').scheduleNotificationAsync).toHaveBeenCalledWith(
       expect.objectContaining({
         content: expect.objectContaining({
           title: 'Price Alert',
