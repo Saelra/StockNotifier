@@ -33,13 +33,13 @@
 			}
 (23)	try {
 
-(24)		const data = await rest.stocks.aggregates(stockSymbol, incrementMultiplier, lowerCaseTimeSpan, formatDateISO(startingDate), formatDateISO(new Date()), { sort: 'asc' });
+(24)		const data = await rest.stocks.aggregates(stockSymbol, incrementMultiplier, lowerCaseTimeSpan, formatDate(startingDate), formatDate(new Date()), { sort: 'asc' });
 (25)		console.log("Data object returned by fetchStockAggregate(): " + data);
 
 (26)		if (data.results) {
 
 (27)			stockAggregate = data.results.filter(result => result.c !== undefined).map(result => result.c as number);
-(28)			dateAggregate = data.results.filter(result => result.t !== undefined).map(result => formatDateISO(new Date(result.t as number * 1000)));
+(28)			dateAggregate = data.results.filter(result => result.t !== undefined).map(result => formatDate(new Date(result.t as number * 1000)));
 (29)			transactionAggregate = data.results.filter(result => result.n !== undefined).map(result => result.n as number);Retrieve stock volumes
 (30)			volumeAggregate = data.results.filter(result => result.v !== undefined).map(result => result.v as number);
 				}

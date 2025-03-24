@@ -47,7 +47,7 @@ describe('Detail Component', () => {
           return Promise.resolve([100, 105, 110]);
 
         case 'priceDates':
-          return Promise.resolve(['2023-01-01', '2023-01-02', '2023-01-03']);
+          return Promise.resolve([new Date(), new Date(), new Date()]);
 
         case 'stockTransactions':
           return Promise.resolve([1000, 1500]);
@@ -59,7 +59,7 @@ describe('Detail Component', () => {
           return Promise.resolve({
             timeRanges: {
               day: {
-                lastFetchTime: '2023-01-01T00:00:00Z',
+                lastFetchTime: null,
                 currentSlope: null,
                 currentPrice: null,
                 slopeAvg: null,

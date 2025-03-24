@@ -18,7 +18,7 @@ export const backgroundFetchTask = async (): Promise<boolean> => {
 
       // If stock data is present then set it, else set empty
       setData<number[]>("stockPrices", stockPrices);
-      setData<string[]>("priceDates", priceDates);
+      setData<Date[]>("priceDates", priceDates);
       setData<number[]>("stockTransactions", stockTransactions);
       setData<number[]>("stockVolumes", stockVolumes);
     }

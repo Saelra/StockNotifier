@@ -1,6 +1,46 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
+ * Recursively converts Date objects to ISO strings.
+ * @param data - The data to be converted.
+ * @returns The converted data.
+ */
+const convertDatesToStrings = (data: any): any => {
+  if (data instanceof Date) {
+    return data.toISOString();
+  } else if (Array.isArray(data)) {
+    return data.map(convertDatesToStrings);
+  } else if (typeof data === 'object' && data !== null) {
+    return Object.keys(data).reduce((acc, key) => {
+      acc[key] = convertDatesToStrings(data[key]);
+      return acc;
+    }, {} as Record<string, any>);
+  } else {
+    return data;
+  }
+};
+
+/**
+ * Recursively converts ISO strings back to Date objects.
+ * @param data - The data to be converted.
+ * @returns The converted data.
+ */
+const convertStringsToDates = (data: any): any => {
+  if (typeof data === 'string' && !isNaN(Date.parse(data))) {
+    return new Date(data);
+  } else if (Array.isArray(data)) {
+    return data.map(convertStringsToDates);
+  } else if (typeof data === 'object' && data !== null) {
+    return Object.keys(data).reduce((acc, key) => {
+      acc[key] = convertStringsToDates(data[key]);
+      return acc;
+    }, {} as Record<string, any>);
+  } else {
+    return data;
+  }
+};
+
+/**
  * Saves data to AsyncStorage under the specified key.
  *
  * @template T - The type of the data to be stored.
@@ -11,7 +51,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  */
 export const setData = async <T>(key: string, data: T): Promise<void> => {
   try {
-    const jsonData = JSON.stringify(data);
+    const jsonData = JSON.stringify(convertDatesToStrings(data));
     await AsyncStorage.setItem(key, jsonData);
     console.log(`Data has been saved to ${key}.`);
   } catch (error) {
@@ -31,7 +71,7 @@ export const setData = async <T>(key: string, data: T): Promise<void> => {
 export const getData = async <T>(key: string): Promise<T | null> => {
   try {
     const jsonData = await AsyncStorage.getItem(key);
-    return jsonData != null ? JSON.parse(jsonData) as T : null;
+    return jsonData != null ? convertStringsToDates(JSON.parse(jsonData)) as T : null;
   } catch (error) {
     console.error(`Error getting data from ${key}:`, error);
     return null;
