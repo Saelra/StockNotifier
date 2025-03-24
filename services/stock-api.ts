@@ -118,7 +118,6 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 			formatDateISO(new Date()),
 			{ sort: 'asc' }
 		);
-		console.log("Data object returned by fetchStockAggregate(): " + data);
 
 		if (data.results) {
 

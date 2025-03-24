@@ -1,43 +1,23 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
- * Recursively converts Date objects to ISO strings.
- * @param data - The data to be converted.
- * @returns The converted data.
+ * Reviver function for JSON.parse to convert ISO strings back to Date objects.
+ * @param _key - The key of the object property being parsed.
+ * @param value - The value of the object property being parsed.
+ * @returns The original value or a new Date object if the value is an ISO string.
  */
-const convertDatesToStrings = (data: any): any => {
-  if (data instanceof Date) {
-    return data.toISOString();
-  } else if (Array.isArray(data)) {
-    return data.map(convertDatesToStrings);
-  } else if (typeof data === 'object' && data !== null) {
-    return Object.keys(data).reduce((acc, key) => {
-      acc[key] = convertDatesToStrings(data[key]);
-      return acc;
-    }, {} as Record<string, any>);
-  } else {
-    return data;
-  }
-};
+const dateReviver = (_key: string, value: unknown): unknown => {
 
-/**
- * Recursively converts ISO strings back to Date objects.
- * @param data - The data to be converted.
- * @returns The converted data.
- */
-const convertStringsToDates = (data: any): any => {
-  if (typeof data === 'string' && !isNaN(Date.parse(data))) {
-    return new Date(data);
-  } else if (Array.isArray(data)) {
-    return data.map(convertStringsToDates);
-  } else if (typeof data === 'object' && data !== null) {
-    return Object.keys(data).reduce((acc, key) => {
-      acc[key] = convertStringsToDates(data[key]);
-      return acc;
-    }, {} as Record<string, any>);
-  } else {
-    return data;
+  if (typeof value === 'string') {
+
+    const date = new Date(value);
+
+    // Check if the value is a valid date
+    if (!isNaN(date.getTime())) {
+      return date;
+    }
   }
+  return value;
 };
 
 /**
@@ -50,11 +30,14 @@ const convertStringsToDates = (data: any): any => {
  * @throws Will log an error message if the data could not be saved.
  */
 export const setData = async <T>(key: string, data: T): Promise<void> => {
+
   try {
-    const jsonData = JSON.stringify(convertDatesToStrings(data));
+    // Convert Date objects to ISO strings
+    const jsonData = JSON.stringify(data, (_k, v) => (v instanceof Date ? v.toISOString() : v));
     await AsyncStorage.setItem(key, jsonData);
-    console.log(`Data has been saved to ${key}.`);
+
   } catch (error) {
+
     console.error(`Error saving data to ${key}:`, error);
   }
 };
@@ -69,10 +52,13 @@ export const setData = async <T>(key: string, data: T): Promise<void> => {
  * @throws Will log an error message if the data could not be retrieved.
  */
 export const getData = async <T>(key: string): Promise<T | null> => {
+
   try {
     const jsonData = await AsyncStorage.getItem(key);
-    return jsonData != null ? convertStringsToDates(JSON.parse(jsonData)) as T : null;
+    return jsonData != null ? (JSON.parse(jsonData, dateReviver) as T) : null;
+
   } catch (error) {
+
     console.error(`Error getting data from ${key}:`, error);
     return null;
   }

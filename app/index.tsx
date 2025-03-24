@@ -4,6 +4,7 @@ import { RelativePathString, useRouter } from 'expo-router';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import { backgroundFetchTask } from '@/services/stock-fetch';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BACKGROUND_FETCH_TASK = 'background-fetch';
 
@@ -28,6 +29,8 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
 const graphImagePath = '../assets/images/graph-image.jpg';
 
 const Landing: React.FC = () => {
+
+  AsyncStorage.clear();
 
   useEffect(() => {
 

@@ -19,15 +19,15 @@ jest.mock("expo-font");
 describe('Dashboard Component', () => {
   test('renders correctly', () => {
     const { getByText } = render(<Dashboard />);
-    expect(getByText('to About')).toBeTruthy();
+    expect(getByText('About Us')).toBeTruthy();
   });
 
   test('calls addMockData when button is pressed', async () => {
     const { getByText } = render(<Dashboard />);
-    const button = getByText('Add MOck Data');
-    
+    const button = getByText('Add Mock Data');
+
     fireEvent.press(button);
-    
+
     await waitFor(() => {
       expect(setData).toHaveBeenCalled();
     });
@@ -35,7 +35,7 @@ describe('Dashboard Component', () => {
 
   test('clears data when clear button is pressed', async () => {
     const { getByText } = render(<Dashboard />);
-    const button = getByText('clear data');
+    const button = getByText('Clear data');
 
     fireEvent.press(button);
 
