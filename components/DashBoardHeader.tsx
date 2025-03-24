@@ -61,6 +61,9 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
   const goToSettings = () => {
     router.push('/settings');
   };
+  const goToNotificationHistory = () => {
+    router.push('/history');
+  };
 
   return (
     <View style={styles.header}>
@@ -107,11 +110,15 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
         </View>
       )}
 
-      <TouchableOpacity onPress={goToSettings}>
-        <Icon name="cog" size={24} color="#000" style={styles.settingsIcon} />
-      </TouchableOpacity>
+      <View style={styles.iconsContainer}>
+        <TouchableOpacity onPress={goToNotificationHistory} style={styles.iconWrapper}>
+          <Icon name="bell" size={24} color="#000" style={styles.icon} />
+        </TouchableOpacity>
 
-
+        <TouchableOpacity onPress={goToSettings} style={styles.iconWrapper}>
+          <Icon name="cog" size={24} color="#000" style={styles.icon} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -175,7 +182,14 @@ const styles = StyleSheet.create({
   suggestionText: {
     fontSize: 16,
   },
-  settingsIcon: {
+  iconsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconWrapper: {
+    marginLeft: 15,
+  },
+  icon: {
     marginLeft: 10,
   },
 });
