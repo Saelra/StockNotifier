@@ -38,8 +38,8 @@ const Detail: React.FC = (): JSX.Element => {
   // State variable for the radio button time-range options and their increment amounts
   const [timeRange, setTimeRange] = useState('week');
   const timeRanges = ['week', 'month', 'quarter', 'year'];
-  const incrementTimes = ['day', 'week', 'month', 'month'];
-  const incrementAmounts = [7, 4, 6, 12];
+  const incrementTimes = ['day', 'week', 'week', 'month'];
+  const incrementAmounts = [7, 4, 12, 12];
 
   const [stockPrices, setStockPrices] = useState<number[] | null>(null);
   const [priceDates, setPriceDates] = useState<Date[] | null>(null);

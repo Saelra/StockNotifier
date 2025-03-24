@@ -1,6 +1,13 @@
-import { getData, setData } from './stock-storage'; // Replace with your actual data storage module
-import { fetchStockAggregate } from './stock-api'; // Replace with your actual fetch stock module
+import { getData, setData } from './stock-storage';
+import { fetchStockAggregate } from './stock-api';
 
+/**
+ * Retrieves meta stock information from async storage, uses this information
+ * to fetch aggregated stock data from the API, and then stores the fetched
+ * data back into storage.
+ *
+ * @returns `true` if the process completes without error, else `false`.
+ */
 export const backgroundFetchTask = async (): Promise<boolean> => {
 
   try {
