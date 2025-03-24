@@ -1,16 +1,46 @@
 import { restClient } from '@polygon.io/client-js';
 
 /**
- * Converts a Date object into the 'yyyy-mm-dd' format and returns it as a string.
+ * Converts a Date object or an array of Date objects into the 'mm/dd/yyyy' format without leading zeros.
+ *
+ * If any item is not a Date, it returns 'Invalid Date'.
+ *
+ * @param {Date | Date[]} input - The Date object or array of Date objects to format.
+ * @returns {string | string[]} - The formatted date(s) in 'yyyy-mm-dd' format or 'Invalid Date'.
+ */
+export const formatDate = (input: Date | Date[]): string | string[] => {
+
+  // Helper function to format a single date object
+  const formatSingleDate = (date: Date): string => {
+
+		const month = date.getMonth() + 1; // Months are zero-based
+		const day = date.getDate();
+		const year = date.getFullYear();
+
+		const formattedMonth = month.toString();
+		const formattedDay = day.toString();
+
+		return `${formattedMonth}/${formattedDay}/${year}`;
+	};
+
+	if (Array.isArray(input)) {
+			return input.map(formatSingleDate);
+	} else {
+			return formatSingleDate(input);
+	}
+}
+
+/**
+ * Converts a Date object into the 'yyyy-mm-dd' format.
  *
  * @param {Date} date - The Date object to format.
- * @returns {string} - The formatted date string in 'yyyy-mm-dd' format.
+ * @returns {string} - The date in 'yyyy-mm-dd' format as a string.
  */
-const formatDateISO = (date: Date): string => {
+export const formatDateISO = (date: Date): string => {
 
 	// Convert the date to an ISO string and split at the "T" character to get only the date.
 	return date.toISOString().split('T')[0];
-};
+}
 
 const rest = restClient("8W1AIBVUlCB6VhhFFZdwtFFF_8Rfvn9B");
 
@@ -48,14 +78,20 @@ const validTimeSpans = ["minute", "hour", "day", "week", "month", "year"];
  * @param {number} [incrementMultiplier=1] - The amount of time per increment (default is 1).
  * @returns {Promise<number[]>} - A promise that resolves to an array of stock prices.
  */
-export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier: number = 1): Promise<[number[], string[], number[], number[]]> => {
+export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string, incrementAmount: number, incrementMultiplier: number = 1): Promise<[number[], Date[], number[], number[]]> => {
 
 	const lowerCaseTimeSpan = timeSpan.toLowerCase().trim();
 
+	let stockAggregate: number[] = [];
+	let dateAggregate: Date[] = [];
+	let transactionAggregate: number[] = [];
+	let volumeAggregate: number[] = [];
+
 	if (!validTimeSpans.includes(lowerCaseTimeSpan)) {
 		console.error("Not a valid time span. Please use 'minute', 'hour', 'day', 'week', 'month', or 'year'");
+		return [stockAggregate, dateAggregate, transactionAggregate, volumeAggregate]
 	}
-	const startingDate = new Date();
+	const startingDate: Date = new Date();
 
 	// Set the correct starting date based on the time span.
 	switch (lowerCaseTimeSpan) {
@@ -72,10 +108,6 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 			startingDate.setFullYear(startingDate.getFullYear() - incrementAmount);
 			break;
 	}
-	let stockAggregate: number[] = [];
-	let dateAggregate: string[] = [];
-	let transactionAggregate: number[] = [];
-	let volumeAggregate: number[] = [];
 
 	try {
 		const data = await rest.stocks.aggregates(
@@ -98,7 +130,7 @@ export const fetchStockAggregate = async (stockSymbol: string, timeSpan: string,
 			// Retrieve price dates
 			dateAggregate = data.results
 				.filter(result => result.t !== undefined)
-				.map(result => formatDateISO(new Date(result.t as number * 1000)));
+				.map(result => new Date(result.t as number));
 
 			// Retrieve stock transactions
 			transactionAggregate = data.results

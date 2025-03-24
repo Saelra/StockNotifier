@@ -38,7 +38,7 @@ function getKeyElements<T>(arr: T[]): T[] {
 
 const ChartObject = ({ stockPrices, priceDates, chartWidth, chartHeight }: chartProp) => {
   return (
-    <View>
+    <View testID="chart">
       <LineChart
         data={{
           // Get the key price dates (up to 5 of them to avoid label overlap)
@@ -52,7 +52,6 @@ const ChartObject = ({ stockPrices, priceDates, chartWidth, chartHeight }: chart
         width={chartWidth ?? Dimensions.get("window").width * 0.9}
         height={chartHeight ?? Dimensions.get("window").height * 0.3}
         yAxisLabel="$"
-        yAxisSuffix="k"
         chartConfig={{
           backgroundGradientFrom: "#222",
           backgroundGradientTo: "#222",

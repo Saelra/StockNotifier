@@ -6,9 +6,10 @@ import { View, Text, TouchableOpacity, StyleSheet, Pressable, Dimensions } from 
 import { setData, getData } from '../services/stock-storage';
 import BasicChart from '@/components/BasicChart';
 import { backgroundFetchTask } from '@/services/stock-fetch';
+import { formatDate } from '../services/stock-api';
 
 interface TimeRangeData {
-  lastFetchTime: string;
+  lastFetchTime: Date;
   currentSlope: number | null;
   currentPrice: number | null;
   slopeAvg: number | null;
@@ -36,11 +37,11 @@ const Detail: React.FC = (): JSX.Element => {
 
   // State variable for the radio button time-range options and their increment amounts
   const [timeRange, setTimeRange] = useState('day');
-  const timeRanges = ['day', 'week', 'month', 'year', 'max'];
+  const timeRanges = ['day', 'week', 'month', 'year'];
   const incrementAmounts = [7, 4, 12, 1, 12];
 
   const [stockPrices, setStockPrices] = useState<number[] | null>(null);
-  const [priceDates, setPriceDates] = useState<string[] | null>(null);
+  const [priceDates, setPriceDates] = useState<Date[] | null>(null);
 
   // State variables for each info box, initialized to null
   const [currentSlope, setCurrentSlope] = useState<number | null>(null);
@@ -58,7 +59,7 @@ const Detail: React.FC = (): JSX.Element => {
 
       // Get stock prices and dates
       let fetchedStockPrices = await getData<number[]>("stockPrices") ?? [];
-      let fetchedPriceDates = await getData<string[]>("priceDates") ?? [];
+      let fetchedPriceDates = await getData<Date[]>("priceDates") ?? [];
 
       // Set stock prices and dates
       setStockPrices(fetchedStockPrices);
@@ -82,8 +83,8 @@ const Detail: React.FC = (): JSX.Element => {
       let stockDetails = (await getData<StockDetails>("stockDetails")) ?? { timeRanges: {} };
       let lastFetchTime = stockDetails.timeRanges[timeRange]?.lastFetchTime;
 
-      // Fetch data if it doesn't exist yet or if it has been at least 15 minutes since the last fetch
-      if (!lastFetchTime || (new Date().getTime() - new Date(lastFetchTime).getTime()) >= 15 * 60 * 1000) {
+      // Fetch data if it doesn't exist yet or if it has been at least a minute since the last fetch
+      if (!lastFetchTime || (new Date().getTime() - new Date(lastFetchTime).getTime()) >= 60 * 1000) {
 
         setData<string>("timeRange", timeRange);
 
@@ -97,7 +98,7 @@ const Detail: React.FC = (): JSX.Element => {
           timeRanges: {
             ...stockDetails.timeRanges, // Preserve existing time ranges
             [timeRange]: {
-              lastFetchTime: new Date().toISOString(), // Store as ISO string
+              lastFetchTime: new Date(),
               currentSlope: currentSlope,
               currentPrice: currentPrice,
               slopeAvg: slopeAvg,
@@ -184,7 +185,7 @@ const Detail: React.FC = (): JSX.Element => {
       <View style={styles.graphContainer} testID="graph-container">
         <BasicChart
           stockPrices={!stockPrices || stockPrices.length === 0 ? [0] : stockPrices}
-          priceDates={!priceDates || priceDates.length === 0  ? [""] : priceDates}
+          priceDates={!priceDates || priceDates.length === 0  ? [""] : formatDate(priceDates) as string[]}
           chartWidth={chartWidth}
           chartHeight={chartHeight}
         />
@@ -274,7 +275,7 @@ const styles = StyleSheet.create({
   },
   timeRangeButton: {
     paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#ccc',

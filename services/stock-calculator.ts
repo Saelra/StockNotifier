@@ -14,7 +14,7 @@ export const getCurrentSlope = (previousNumber: number, currentNumber: number): 
 	if (!previousNumber || !currentNumber) {
         return null;
     }
-	return previousNumber - currentNumber;
+	return previousNumber - currentNumber / 2;
 };
 
 export const getSlopeAverage = (numbers: number[]): number | null => {
