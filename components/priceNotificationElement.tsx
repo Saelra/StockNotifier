@@ -47,7 +47,7 @@ const alertNotification = async ({ stock, threshold, alertType }: alertObject): 
         message,
         [
           { text: 'Discard', onPress: () => resolve(false), style: 'cancel' },
-          { text: 'Keep', onPress: () => resolve(true) },
+          { text: 'Keep', onPress: () => { resolve(true); saveNotificationToHistory(message);}},
         ],
         { cancelable: false }
       );
