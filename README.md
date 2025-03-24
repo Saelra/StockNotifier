@@ -1,6 +1,6 @@
 # StockNotifier
 
-StockNotifier is a mobile application developed with Expo and React Native, utilizing the Polygon API to provide real-time stock market notifications. The app enables users to monitor stock prices and receive timely alerts based on their preferences.
+StockNotifier is a mobile application developed with Expo and React Native, utilizing the Polygon API to provide stock market notifications. The app enables users to monitor stock prices and receive timely alerts based on their preferences.
 
 ## Features
 
