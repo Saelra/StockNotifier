@@ -12,10 +12,6 @@ jest.mock('@/components/priceNotificationElement', () => ({
   getHistoryData: jest.fn(),
 }));
 
-jest.mock('@expo/vector-icons');
-
-jest.mock('expo-font');
-
 describe('NotificationHistoryPage', () => {
 
   it('displays "No notifications yet." when there is no history', async () => {
