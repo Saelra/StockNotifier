@@ -1,4 +1,4 @@
-import { Alert, AppState, AppStateStatus } from 'react-native';
+import { Alert, AppState } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { stockInformation } from '../app/dashboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
