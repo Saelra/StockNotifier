@@ -1,8 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import Dashboard from '../app/dashboard';
-import { setData, getData } from '../services/stock-storage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setData } from '../services/stock-storage';
 
 jest.mock('../services/stock-storage', () => ({
   setData: jest.fn(),

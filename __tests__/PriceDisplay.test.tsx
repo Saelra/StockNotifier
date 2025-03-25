@@ -1,7 +1,6 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render } from "@testing-library/react-native";
 import PriceDisplay from "../components/PriceDisplay";
-import { router } from "expo-router";
 
 jest.mock("expo-router", () => ({
     router: {
@@ -29,7 +28,7 @@ describe (" Price Display Component", () => {
             priceDelta={priceDisplayData.mockDelta}
             percentIncrease={priceDisplayData.mockIncrease}
         />)
-    
+
        expect(getByText(`${monthName[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`)).toBeTruthy();
        expect(getByText("+$1.00 (10.00%)")).toBeTruthy();
        expect(getByText("$400.00")).toBeTruthy();

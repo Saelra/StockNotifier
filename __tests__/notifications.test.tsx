@@ -1,8 +1,7 @@
-import React from 'react';
 import { Alert, AppState } from 'react-native';
 import alertNotification, { AlertType } from '../components/priceNotificationElement';
 import { stockInformation } from '../app/dashboard';
-import { render, fireEvent, act } from '@testing-library/react-native';
+import { act } from '@testing-library/react-native';
 
 jest.mock('react-native', () => ({
   Alert: {

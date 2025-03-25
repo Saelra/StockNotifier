@@ -64,14 +64,13 @@ const Dashboard : React.FC = () => {
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
   const [historyList, setHistoryList] = useState<historyObject[]>([]);
-  const [ticker, setTicker] = useState<string >("appl");
 
   /**
    * objec that is used in the Ticker object
    * @param data
    */
   const handleTickerDataSelect = (data: string) => {
-    setTicker(data);
+
     const newSymbolInformation: symbolInformation = {
       name: 'Stock Symbol: ',
       symbol: data
@@ -172,7 +171,7 @@ const Dashboard : React.FC = () => {
         getHistoryData(symbolInfo.symbol)
         .then( (value) =>{setHistoryList(value)})
         .catch( () =>{setHistoryList([])});
-        
+
       } else{
         updateCurrentStockInfo();
       }
@@ -212,7 +211,7 @@ const Dashboard : React.FC = () => {
    */
   function addNewHistoryObject(price: number, threshold: number, priceDelta: number): void {
       const date = new Date();
-      
+
       const dateString = date.toLocaleDateString("en-US");
 
       console.log(dateString);
@@ -302,7 +301,6 @@ const Dashboard : React.FC = () => {
       priceDelta: 0,
       percentIncrease: 0
     };
-    const dataI : number[] = [];
     const symbolI : symbolInformation= {
       name: "----",
       symbol: "----"
