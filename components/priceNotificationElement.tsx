@@ -58,7 +58,7 @@ const alertNotification = async ({ stock, threshold, alertType }: alertObject): 
 // Function to save the message to history in AsyncStorage
 const saveNotificationToHistory = async (message: string) => {
   const historyData = await getHistoryData('notificationHistory');
-  
+
   const newHistoryObject = {
     dateOccurrence: new Date(),
     message,
@@ -70,7 +70,6 @@ const saveNotificationToHistory = async (message: string) => {
   try {
     const jsonData = JSON.stringify(updatedHistory);
     await AsyncStorage.setItem('notificationHistory', jsonData);
-    console.log('Notification history saved successfully.');
   } catch (error) {
     console.error('Error saving notification history:', error);
   }
