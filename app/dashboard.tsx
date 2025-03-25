@@ -64,14 +64,13 @@ const Dashboard : React.FC = () => {
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
   const [historyList, setHistoryList] = useState<historyObject[]>([]);
-  const [ticker, setTicker] = useState<string >("appl");
 
   /**
    * objec that is used in the Ticker object
    * @param data
    */
   const handleTickerDataSelect = (data: string) => {
-    setTicker(data);
+
     const newSymbolInformation: symbolInformation = {
       name: 'Stock Symbol: ',
       symbol: data
@@ -88,7 +87,7 @@ const Dashboard : React.FC = () => {
     try {
       const jsonData = JSON.stringify(data);
       await AsyncStorage.setItem(key, jsonData);
-      console.log(`Data has been saved to ${key}.`);
+
     } catch (error) {
       console.error(`Error saving data to ${key}:`, error);
     }
@@ -117,7 +116,7 @@ const Dashboard : React.FC = () => {
   async function changeSymbol(sym: symbolInformation):Promise<void> {
     setHistoryData(sym.symbol,historyList); //put old history into storage
     clearData();
-    console.log("getting history data");
+
     getHistoryData(sym.symbol)
       .then( (value) =>{setHistoryList(value)})
       .catch( () =>{setHistoryList([])});
@@ -160,10 +159,10 @@ const Dashboard : React.FC = () => {
    * It calls storage to get the informaiton to populate the dashboard data.
    */
   useEffect(() => {
-    console.log("useEffect active"); //remove me for production!
+
     getData<stockInformation>('userStockInfo').then(value => {
       if (value) {
-        console.log("Success! values retrieved from storage");
+
         setDataState(value.graphP);
         setPriceInfo(value.priceI);
         setSymbolInfo(value.symbolI);
@@ -172,7 +171,7 @@ const Dashboard : React.FC = () => {
         getHistoryData(symbolInfo.symbol)
         .then( (value) =>{setHistoryList(value)})
         .catch( () =>{setHistoryList([])});
-        
+
       } else{
         updateCurrentStockInfo();
       }
@@ -199,9 +198,8 @@ const Dashboard : React.FC = () => {
       min: parsedMinPrice,
       max: parsedMaxPrice
     }
-    console.log(currentStock);
-     setCurrentStockInfo(currentStock);
-     setData('userStockInfo', currentStock);
+    setCurrentStockInfo(currentStock);
+    setData('userStockInfo', currentStock);
   }
 
   /**
@@ -212,10 +210,8 @@ const Dashboard : React.FC = () => {
    */
   function addNewHistoryObject(price: number, threshold: number, priceDelta: number): void {
       const date = new Date();
-      
-      const dateString = date.toLocaleDateString("en-US");
 
-      console.log(dateString);
+      const dateString = date.toLocaleDateString("en-US");
 
       const newHistoryObject : historyObject  = {
         dateOccurrence: dateString,
@@ -302,7 +298,6 @@ const Dashboard : React.FC = () => {
       priceDelta: 0,
       percentIncrease: 0
     };
-    const dataI : number[] = [];
     const symbolI : symbolInformation= {
       name: "----",
       symbol: "----"

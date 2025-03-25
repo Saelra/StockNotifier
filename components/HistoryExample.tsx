@@ -1,5 +1,5 @@
 import React from "react";
-import {View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity} from 'react-native';
+import { Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import HistoryItem from "@/components/HistoryItem"
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
@@ -25,7 +25,7 @@ const History : React.FC<HistoryProps> = ({historyList}) => {
         <>
             <SafeAreaView style={styles.historyHeader}>
                 <TouchableOpacity onPress={goToNotificationHistory}>
-                    <Text style={styles.header}> Price Notification History 
+                    <Text style={styles.header}> Price Notification History
                         <Ionicons name="arrow-forward-outline" size={20} color="black"/>
                     </Text>
                 </TouchableOpacity>

@@ -161,7 +161,6 @@ export const searchStockTickers = async (query: string): Promise<string[]> => {
 	if (!query.trim()) return stockSymbols;
 
 	try {
-			console.log("Fetching stock tickers for:", query);
 
 			const response = await rest.reference.tickers({
 					search: query.toUpperCase(),
