@@ -5,7 +5,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 
 type historyObject = {
-    dateOccurrence : Date,
+    dateOccurrence : string,
     isPositive: boolean,
     priceDifference : number
 }

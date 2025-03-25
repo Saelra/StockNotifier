@@ -10,6 +10,12 @@ type chartProp = {
   chartHeight?: number;
 };
 
+/**
+ * This function will calculate the dates to display in the chart from 0 to 5 dates displayed
+ * to not clutter up the graph
+ * @param arr is the array of points in the chart
+ * @returns array of dates to display in numbe format
+ */
 function getKeyElements<T>(arr: T[]): T[] {
 
   const n = arr.length;
@@ -36,6 +42,14 @@ function getKeyElements<T>(arr: T[]): T[] {
   return result.slice(0, 5);
 }
 
+/**
+ * 
+ * @param stockPrices are the current stock prices in a list
+ * @param priceDates are the list of date to use in the x axis
+ * @param chartWidth are the widthc for the chart
+ * @param chartHieght is the set hight of the chart
+ * @returns a chart object to be rendered
+ */
 const ChartObject = ({ stockPrices, priceDates, chartWidth, chartHeight }: chartProp) => {
   return (
     <View testID="chart">

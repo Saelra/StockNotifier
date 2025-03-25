@@ -7,6 +7,13 @@ type symbolProps = {
     name?: string
 };
 
+/**
+ * 
+ * @param symbol is the symbol of the stock
+ * @param name is the name of the stock, currently there is no name so
+ * we pass the name "Stock Symbol: " 
+ * @returns the header object to be sent to the dashboard. 
+ */
 const SymbolHeader = ({symbol, name} : symbolProps) => {
     return (
         <View>

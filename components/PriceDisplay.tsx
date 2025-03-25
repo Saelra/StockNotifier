@@ -8,6 +8,13 @@ type PriceProps = {
   percentIncrease: number;
 };
 
+/**
+ * 
+ * @param price is the current price to be displayed
+ * @param priceDelta is the differnet between current and new price.
+ * @param percentIncrease is the percentage of increase in price.
+ * @returns the month in string format
+ */
 const PriceDisplay = ({ price, priceDelta, percentIncrease }: PriceProps) => {
   const date = new Date();
   const monthName = [

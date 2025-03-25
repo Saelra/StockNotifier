@@ -53,18 +53,34 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
     return () => clearTimeout(delaySearch);
   }, [searchQuery]);
 
+  /**
+   * Not sure what the ticker is did not write this function but the ticker
+   * is passed to the settign page
+   * @param ticker symbol 
+   */
   const handleTickerSelect = (ticker: string) => {
     setSearchQuery("");
     onTickerDataSelect(ticker);
     setFilteredTickers([]);
   };
+
+  /**
+   * function to route to the setting page
+   */
   const goToSettings = () => {
     router.push('/settings');
   };
+
+  /**
+   * function to route to the notification history page
+   */
   const goToNotificationHistory = () => {
     router.push('/history');
   };
 
+  /**
+   * the rentered object returned to the dashboard
+   */
   return (
     <View style={styles.header}>
       <View style={styles.searchContainer}>
@@ -123,6 +139,10 @@ const dbHeader = ({ onTickerDataSelect }: dbHeaderProps) => {
   );
 };
 
+
+/**
+ * CSS styling!
+ */
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",

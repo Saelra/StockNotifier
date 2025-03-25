@@ -4,7 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 
 type historyProp =  {
-    hDate : Date,
+    hDate : string,
     isPositive : boolean,
     priceDifference : number
 
@@ -13,11 +13,15 @@ type historyProp =  {
 
 
 const HistoryItem = ({hDate, isPositive, priceDifference} : historyProp) => {
+    if(!hDate){
+      return (null);
+    }
+
     return (
         <>
         <View style={styles.container}>
             <Ionicons name="alert-circle" size={35} />
-            <Text > {hDate.toLocaleDateString()}</Text>
+            <Text > {hDate}</Text>
             <Ionicons name="trash" size={35} style={styles.trashStyle}/>
         </View>
             <Text style ={{color : isPositive? "green" : "red", marginLeft: 45}}> stock price {isPositive? "above" : "below"} threshold by {priceDifference.toFixed(2)} </Text>

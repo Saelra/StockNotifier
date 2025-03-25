@@ -17,33 +17,10 @@ import { backgroundFetchTask } from "@/services/stock-fetch";
  * Is positive used to show if the price went up or down.
  */
 type historyObject = {
-  dateOccurrence : Date,
+  dateOccurrence : string,
   isPositive: boolean,
   priceDifference : number
 }
-
-/**
- * used in debugging
- */
-const createFakeHistory : historyObject[] = [
-      {
-        dateOccurrence : new Date('2025-01-01'),
-
-        isPositive: true,
-        priceDifference : 4.00
-    },
-    {
-      dateOccurrence : new Date('2025-01-28'),
-
-      isPositive: false,
-      priceDifference : 2.00
-    },
-    {
-      dateOccurrence : new Date('2025-02-14'),
-      isPositive: true,
-      priceDifference : 4.80
-    }
-  ]
 
 /**
  * object to hold the price information displayed in the dashboard
@@ -80,7 +57,6 @@ export interface stockInformation {
  * @returns the Dashobard react object. its the top layer in the dashboard page.
  */
 const Dashboard : React.FC = () => {
-
 
   const [dataState, setDataState] = useState([0]);
   const [priceInfo, setPriceInfo] = useState<priceInformation>({price: 0, priceDelta: 0, percentIncrease: 0})
@@ -138,13 +114,16 @@ const Dashboard : React.FC = () => {
    * since with a new symbol, the information will change.
    * @param sym is a symbolInformaiton Object that holds the new symbol
    */
-  function changeSymbol(sym: symbolInformation):void {
-    setHistoryData(sym.symbol,historyList);
+  async function changeSymbol(sym: symbolInformation):Promise<void> {
+    setHistoryData(sym.symbol,historyList); //put old history into storage
     clearData();
     console.log("getting history data");
+    getHistoryData(sym.symbol)
+      .then( (value) =>{setHistoryList(value)})
+      .catch( () =>{setHistoryList([])});
     setSymbolInfo(sym);
     //pull from history the history :)
-    // updateCurrentStockInfo();
+    updateCurrentStockInfo();
 
     // Set stock symbol in async storage
     setData<string>("stockSymbol", sym.symbol);
@@ -190,9 +169,10 @@ const Dashboard : React.FC = () => {
         setSymbolInfo(value.symbolI);
         setMinValue(value.min);
         setMaxValue(value.max);
-        // getHistoryData(value.symbolI.symbol)
-        // .then(hValue => {setHistoryList(hValue)})
-
+        getHistoryData(symbolInfo.symbol)
+        .then( (value) =>{setHistoryList(value)})
+        .catch( () =>{setHistoryList([])});
+        
       } else{
         updateCurrentStockInfo();
       }
@@ -207,9 +187,6 @@ const Dashboard : React.FC = () => {
     // Retrieve min and max values from AsyncStorage
     const minPrice = await AsyncStorage.getItem(`minPrice-${symbolInfo.symbol}`);
     const maxPrice = await AsyncStorage.getItem(`maxPrice-${symbolInfo.symbol}`);
-
-    // console.log("Retrieved minPrice:", minPrice);
-    // console.log("Retrieved maxPrice:", maxPrice);
 
     // Ensure we parse the values as numbers and handle null values
     const parsedMinPrice = minPrice ? parseFloat(minPrice) : 0;
@@ -234,17 +211,24 @@ const Dashboard : React.FC = () => {
    * @param priceDelta what the change in price is
    */
   function addNewHistoryObject(price: number, threshold: number, priceDelta: number): void {
+      const date = new Date();
+      
+      const dateString = date.toLocaleDateString("en-US");
+
+      console.log(dateString);
+
       const newHistoryObject : historyObject  = {
-        dateOccurrence: new Date(),
+        dateOccurrence: dateString,
         isPositive: (price > threshold),
         priceDifference: Math.abs(price - priceDelta)
       };
       const newHistoryList: historyObject[] = [...historyList,newHistoryObject]
 
-      //only keep the last 10 History objects.
+      //only keep the last 4 History objects.
       if(newHistoryList.length > 4){
         newHistoryList.shift();
       }
+      setHistoryData(symbolInfo.symbol, newHistoryList);
       setHistoryList(newHistoryList);
   }
 
@@ -297,9 +281,7 @@ const Dashboard : React.FC = () => {
         addNewHistoryObject(newPriceInfo.price, minValue, newPriceInfo.priceDelta);
       }
     }
-
     setPriceInfo(newPriceInfo);
-
     updateCurrentStockInfo();
   }
 
@@ -329,7 +311,6 @@ const Dashboard : React.FC = () => {
     setHistoryList([]);
     setSymbolInfo(symbolI);
     setPriceInfo(priceI);
-
   }
 
 
